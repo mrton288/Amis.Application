@@ -1,4 +1,5 @@
 ﻿using Demo.WebApplication.Common.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Demo.WebApplication.Common.Entities
 {

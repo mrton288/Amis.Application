@@ -117,13 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_Delete" xml:space="preserve">
-    <value>Xoá thành công !</value>
+  <data name="DevMsg_DuplicateCode" xml:space="preserve">
+    <value>Trùng mã nhân viên !</value>
   </data>
-  <data name="S_Post" xml:space="preserve">
-    <value>Thêm mới thành công !</value>
+  <data name="DevMsg_Exception" xml:space="preserve">
+    <value>Có lỗi xảy ra !</value>
   </data>
-  <data name="S_Put" xml:space="preserve">
-    <value>Sửa thành công !</value>
+  <data name="DevMsg_InValid" xml:space="preserve">
+    <value>Dữ liệu đầu vào không hợp lệ !</value>
+  </data>
+  <data name="DevMsg_NotFound" xml:space="preserve">
+    <value>Không tìm thấy ID nhân viên !</value>
   </data>
 </root>

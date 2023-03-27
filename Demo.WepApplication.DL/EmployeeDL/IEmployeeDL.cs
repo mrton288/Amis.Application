@@ -7,117 +7,46 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Dapper;
+using Demo.WepApplication.DL.BaseDL;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
-    public interface IEmployeeDL
+    public interface IEmployeeDL : IBaseDL<Employee>
     {
-
         /// <summary>
-        /// Thực hiên mở kết nối tới database
+        /// Sinh ra mã nhân viên mới
         /// </summary>
-        /// <returns></returns>
-        /// Author: NVDUC (13/3/2023)
-        public IDbConnection GetOpenConnection();
+        /// <returns>Mã nhân viên mới</returns>
+        /// Author: NVDUC (24/3/2023)
+        public string GetNewCode();
 
         /// <summary>
-        /// Thay thế cho việc khởi tạo Employee
-        /// </summary>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public Employee QueryFirstOrDefault(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
-        /// <summary>
-        /// Thực thi câu lệnh sql và thay thế cho việc khởi tạo Employee
-        /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public IEnumerable<Employee> Query(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null);
-
-        /// <summary>
-        /// Thực thi câu lệnh sql và thay thế cho việc khởi tạo Employee
-        /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public int Execute(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
-        /// <summary>
-        /// Thực thi câu lệnh sql, trả về các đầu dữ liệu
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public SqlMapper.GridReader QueryMultiple(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
-        /// <summary>
-        /// Trả về danh sách nhân viên
-        /// </summary>
-        /// <returns>Danh sách nhân viên</returns>
-        /// Author: NVDUC (23/3/2023)
-        public List<Employee> GetAllEmployee();
-
-        /// <summary>
-        /// Lấy ra thông tin nhân viên
-        /// </summary>
-        /// <param name="employeeId"></param>
-        /// <returns>Thông tin của nhân viên đó</returns>
-        /// Author: NVDUC (23/3/2023)
-        public Employee GetEmployeeById(Guid employeeId);
-
-        /// <summary>
-        /// Cập nhật thông tin nhân viên theo Id
-        /// </summary>
-        /// <param name="employeeId"></param>
-        /// <param name="newEmployee"></param>
-        /// <returns>Trạng thái của hành động</returns>
-        /// Author: NVDUC (23/3/2023)
-        /// 
-        public int UpdateEmployeeById(Guid employeeId, Employee newEmployee);
-
-        /// <summary>
-        /// Thực hiện thêm mới nhân viên
-        /// </summary>
-        /// <param name="newEmployee"></param>
-        /// <returns>Trạng thái của hành động thêm mới</returns>
-        /// Author: NVDUC (23/3/2023)
-        public int InsertEmployee(Employee newEmployee);
-
-        /// <summary>
-        /// Xoá nhân viên theo Id
-        /// </summary>
-        /// <param name="employeeId"></param>
-        /// <returns>Mã trạng thái thành công hay thất bại</returns>
-        /// Author: NVDUC (23/3/2023)
-        public int DeleteEmployeeById(Guid employeeId);
-
-        /// <summary>
-        /// Thực hiện tìm kiếm phân trang danh sách nhân viên
+        /// Thực hiện tìm kiếm phân trang danh sách bản ghi
         /// </summary>
         /// <param name="search"></param>
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public PagingResult FilterEmployee(
+        public PagingResult<Employee> GetPaging(
         string? search,
-        int pageNumber = 1,
-        int pageSize = 50
+        int? pageNumber,
+        int? pageSize
        );
+
+        /// <summary>
+        /// Xoá nhiều nhân viên theo danh sách Id
+        /// </summary>
+        /// <param name="listEmployeeId"></param>
+        /// <returns>Số lượng Id trong danh sách</returns>
+        /// Author: NVDUC (25/3/2023)
+        public int DeleteMultiple(Guid[] listEmployeeId);
+
+        /// <summary>
+        /// Kiểm tra trùng mã nhân viên theo mã nhân viên
+        /// </summary>
+        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
+        /// Author: NVDUC (26/3/2023)
+        public bool CheckDuplicateCode(string employeeCode);
     }
 }

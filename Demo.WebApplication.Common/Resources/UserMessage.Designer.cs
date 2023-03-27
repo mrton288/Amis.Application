@@ -22,14 +22,14 @@ namespace Demo.WebApplication.Common.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class StatusMessage {
+    public class UserMessage {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal StatusMessage() {
+        internal UserMessage() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Demo.WebApplication.Common.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Demo.WebApplication.Common.Resources.StatusMessage", typeof(StatusMessage).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Demo.WebApplication.Common.Resources.UserMessage", typeof(UserMessage).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,38 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Xoá thành công !.
+        ///   Looks up a localized string similar to Trùng mã nhân viên !.
         /// </summary>
-        public static string S_Delete {
+        public static string UserMsg_DuplicateCode {
             get {
-                return ResourceManager.GetString("S_Delete", resourceCulture);
+                return ResourceManager.GetString("UserMsg_DuplicateCode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thêm mới thành công !.
+        ///   Looks up a localized string similar to Có lỗi xảy ra vui lòng liên hệ trung tâm tư vấn !.
         /// </summary>
-        public static string S_Post {
+        public static string UserMsg_Exception {
             get {
-                return ResourceManager.GetString("S_Post", resourceCulture);
+                return ResourceManager.GetString("UserMsg_Exception", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sửa thành công !.
+        ///   Looks up a localized string similar to Dữ liệu đầu vào không hợp lệ !.
         /// </summary>
-        public static string S_Put {
+        public static string UserMsg_InValid {
             get {
-                return ResourceManager.GetString("S_Put", resourceCulture);
+                return ResourceManager.GetString("UserMsg_InValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy nhân viên !.
+        /// </summary>
+        public static string UserMsg_NotFound {
+            get {
+                return ResourceManager.GetString("UserMsg_NotFound", resourceCulture);
             }
         }
     }

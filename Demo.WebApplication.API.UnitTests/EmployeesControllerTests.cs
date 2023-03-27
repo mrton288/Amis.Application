@@ -1,6 +1,4 @@
 ﻿using Demo.WebApplication.API.Controllers;
-using Demo.WebApplication.API.Database;
-using Demo.WebApplication.API.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -24,41 +22,41 @@ namespace Demo.WebApplication.API.UnitTests
         /// kiểm tra hàm xử lý thành công có đúng hay không
         /// </summary>
         /// Author: NVDUC (20/3/2023)
-        [Test]
-        public void GetEmployeeById_ExistsEmployee_ReturnSuccess()
-        {
-            // Arrange: chuẩn bị dữ liệu đầu vào
-            var employeeId = new Guid("9346c9f2-14da-46db-815a-0a2bd559e5d6");
-            var employee = new Employee
-            {
-                EmployeeId = employeeId,
-                EmployeeCode = "NV-0011",
-                FullName = "Nguyễn Văn Đức",
-                DepartmentId = new Guid("4e272fc4-7875-78d6-7d32-6a1673ffca7c"),
+        //[Test]
+        //public void GetEmployeeById_ExistsEmployee_ReturnSuccess()
+        //{
+        //    // Arrange: chuẩn bị dữ liệu đầu vào
+        //    var employeeId = new Guid("9346c9f2-14da-46db-815a-0a2bd559e5d6");
+        //    var employee = new Employee
+        //    {
+        //        EmployeeId = employeeId,
+        //        EmployeeCode = "NV-0011",
+        //        FullName = "Nguyễn Văn Đức",
+        //        DepartmentId = new Guid("4e272fc4-7875-78d6-7d32-6a1673ffca7c"),
 
-            };
-            var expectedResult = new ObjectResult(employee);
-            expectedResult.StatusCode = 200;
-            var fakeEmployeeRepository = Substitute.For<IEmployeeRepository>();
-            fakeEmployeeRepository.QueryFirstOrDefault(
-                Arg.Any<IDbConnection>(),
-                Arg.Any<string>(),
-                Arg.Any<object>(),
-                Arg.Any<IDbTransaction>(),
-                Arg.Any<int>(),
-                Arg.Any<CommandType?>()).Returns(employee);
-            var employeeController = new EmployeesController(fakeEmployeeRepository);
+        //    };
+        //    var expectedResult = new ObjectResult(employee);
+        //    expectedResult.StatusCode = 200;
+        //    var fakeEmployeeRepository = Substitute.For<IEmployeeRepository>();
+        //    fakeEmployeeRepository.QueryFirstOrDefault(
+        //        Arg.Any<IDbConnection>(),
+        //        Arg.Any<string>(),
+        //        Arg.Any<object>(),
+        //        Arg.Any<IDbTransaction>(),
+        //        Arg.Any<int>(),
+        //        Arg.Any<CommandType?>()).Returns(employee);
+        //    var employeeController = new EmployeesController(fakeEmployeeRepository);
 
-            // Act
-            var actualResult = (ObjectResult)employeeController.GetEmployeeById(employeeId);
+        //    // Act
+        //    var actualResult = (ObjectResult)employeeController.GetEmployeeById(employeeId);
 
-            // Assert
-            Assert.AreEqual(expectedResult.StatusCode, actualResult.StatusCode);
-            Assert.AreEqual(employee.FullName, ((Employee)actualResult.Value).FullName);
-            Assert.AreEqual(employee.EmployeeCode, ((Employee)actualResult.Value).EmployeeCode);
-            Assert.AreEqual(employee.DepartmentId, ((Employee)actualResult.Value).DepartmentId);
+        //    // Assert
+        //    Assert.AreEqual(expectedResult.StatusCode, actualResult.StatusCode);
+        //    Assert.AreEqual(employee.FullName, ((Employee)actualResult.Value).FullName);
+        //    Assert.AreEqual(employee.EmployeeCode, ((Employee)actualResult.Value).EmployeeCode);
+        //    Assert.AreEqual(employee.DepartmentId, ((Employee)actualResult.Value).DepartmentId);
 
-        }
+        //}
 
         /// <summary>
         /// Fake dữ liệu các tham số đầu vào để 

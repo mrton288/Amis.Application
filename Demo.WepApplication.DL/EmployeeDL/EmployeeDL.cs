@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
+using Demo.WepApplication.DL.BaseDL;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -11,175 +12,156 @@ using System.Threading.Tasks;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
-    public class EmployeeDL : IEmployeeDL
+    public class EmployeeDL : BaseDL<Employee>, IEmployeeDL
     {
 
-        #region Field
-
-        private readonly string _conectionString = "Server=localhost;Port=3306;Database=misa.web202301_mf1562_nvduc;Uid=root;Pwd=123456;";
-
-        #endregion
-
         #region Method
-        /// <summary>
-        /// Trả về danh sách nhân viên
-        /// </summary>
-        /// <returns>Danh sách nhân viên</returns>
-        /// Author: NVDUC (23/3/2023)
-        public List<Employee> GetAllEmployee()
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
-        /// Lấy ra thông tin nhân viên
+        /// Sinh ra mã nhân viên mới
         /// </summary>
-        /// <param name="employeeId"></param>
-        /// <returns>Thông tin của nhân viên đó</returns>
-        /// Author: NVDUC (23/3/2023)
-        public Employee GetEmployeeById(Guid employeeId)
+        /// <returns>Mã nhân viên mới</returns>
+        /// Author: NVDUC (24/3/2023)
+        public string GetNewCode()
         {
-            // Chuẩn bị tên stored
-            string storedProcedureName = "Proc_employee_GetById";
-
-            // Chuẩn bị tham số đầu vào
-            var parameters = new DynamicParameters();
-            parameters.Add("@v_employeeId", employeeId);
-
             // Khởi tạo kết nối tới database
             var dbConnection = GetOpenConnection();
 
-            // Thực hiện câu lệnh sql
-            var employee = QueryFirstOrDefault(dbConnection, storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+            // Tương tác với database
+            string getMaxCode = "SELECT MAX(e.EmployeeCode) FROM Employee e;";
+            string result = dbConnection.QueryFirstOrDefault<string>(getMaxCode, commandType: System.Data.CommandType.Text);
+            // Mã nhân viên cuối
+            int numberEmployeeCode = Convert.ToInt32(result.Substring(2)) + 1;
 
-            return employee;
+            // Format lại mã nhân viên cuối nếu không đủ 5 số
+            int numberEmployeeCodeClone = numberEmployeeCode;
+
+            // Đếm số lượng chữ số trong mã số đó
+            int count = 0;
+            while (numberEmployeeCodeClone > 0)
+            {
+                numberEmployeeCodeClone /= 10;
+                count++;
+            }
+            count -= 5;
+
+            // Số 0 thêm vào phía trước để format
+            string employeeCodeFormat = "";
+            // Số lượng chữ còn thiếu để đủ 5 số
+            if (count < 0)
+            {
+                count = Math.Abs(count);
+                while (count > 0)
+                {
+                    employeeCodeFormat += "0";
+                    count--;
+                }
+            }
+
+            result = result.Substring(0, 2) + employeeCodeFormat + numberEmployeeCode;
+            if (result == null)
+            {
+                return "NV00001";
+            }
+            dbConnection.Close();
+            return result;
         }
 
         /// <summary>
-        /// Thực hiện thêm mới nhân viên
-        /// </summary>
-        /// <param name="newEmployee"></param>
-        /// <returns>Trạng thái của hành động thêm mới</returns>
-        /// Author: NVDUC (23/3/2023)
-        public int InsertEmployee(Employee newEmployee)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Cập nhật thông tin nhân viên theo Id
-        /// </summary>
-        /// <param name="employeeId"></param>
-        /// <param name="newEmployee"></param>
-        /// <returns>Trạng thái của hành động</returns>
-        /// Author: NVDUC (23/3/2023)
-        /// 
-        public int UpdateEmployeeById(Guid employeeId, Employee newEmployee)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Xoá nhân viên theo Id
-        /// </summary>
-        /// <param name="employeeId"></param>
-        /// <returns>Mã trạng thái thành công hay thất bại</returns>
-        /// Author: NVDUC (23/3/2023)
-        public int DeleteEmployeeById(Guid employeeId)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Thực hiện tìm kiếm phân trang danh sách nhân viên
+        /// Thực hiện tìm kiếm phân trang danh sách bản ghi
         /// </summary>
         /// <param name="search"></param>
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public PagingResult FilterEmployee(string? search, int pageNumber = 1, int pageSize = 50)
-        {
-            throw new NotImplementedException();
-        }
 
-        /// <summary>
-        /// Implement hàm mở kết nối từ interface
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public IDbConnection GetOpenConnection()
+        public PagingResult<Employee> GetPaging(string? search, int? pageNumber, int? pageSize)
         {
+            int totalRecord = 0;
+            int totalPage = 0;
+            // Chuẩn bị tên storeProcedure
+            string storedProcedureName = "Proc_employee_GetPaging";
+
+            // Chuẩn bị tham số đầu vào
+            var parameters = new DynamicParameters();
+            parameters.Add("@v_pageNumber", pageNumber);
+            parameters.Add("@v_pageSize", pageSize);
+            parameters.Add("@v_search", search);
+
+            // Lấy tổng số bản ghi
+            parameters.Add("@v_totalRecord", totalRecord);
+            // Lấy tổng số trang
+            parameters.Add("@v_totalPage", totalPage);
+
             // Khởi tạo kết nối với DB
-            var mySqlConnection = new MySqlConnection(_conectionString);
-            mySqlConnection.Open();
-            return mySqlConnection;
+            var dbConnection = GetOpenConnection();
+
+            // Thưc hiện câu lệnh sql
+            var multipleResults = dbConnection.QueryMultiple(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+
+            // Lấy danh sách nhân viên
+            var employeeList = multipleResults.Read<Employee>().ToList();
+            totalRecord = multipleResults.Read<int>().FirstOrDefault();
+            totalPage = multipleResults.Read<int>().FirstOrDefault();
+
+
+            var result = new PagingResult<Employee>
+            {
+                Data = employeeList,
+                TotalRecord = totalRecord,
+                TotalPage = totalPage,
+                CurrentPage = pageNumber,
+                CurrentPageRecords = pageSize,
+            };
+            return result;
+
         }
 
         /// <summary>
-        /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface 
+        /// Xoá nhiều nhân viên theo danh sách Id
         /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public int Execute(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        /// <param name="listEmployeeId"></param>
+        /// <returns>Số lượng Id trong danh sách</returns>
+        /// Author: NVDUC (25/3/2023)
+
+        public int DeleteMultiple(Guid[] listEmployeeId)
         {
-            return cnn.Execute(sql, param, transaction, commandTimeout, commandType);
+            // Chuẩn bị store
+            string deleteMultiple = "DELETE FROM employee WHERE EmployeeId IN @listEmployeeId";
+            // Chuẩn bị các tham số đầu vào
+            var parameters = new DynamicParameters();
+            parameters.Add("@listEmployeeId", listEmployeeId);
+
+            // Khởi tạo kết nối tới database
+            var dbConnection = GetOpenConnection();
+
+            int numberRecord = dbConnection.Execute(deleteMultiple, parameters, commandType: System.Data.CommandType.Text);
+            dbConnection.Close();
+            return numberRecord;
         }
 
         /// <summary>
-        /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface 
-        /// Query: Dùng cho lấy tất cả bản ghi
+        /// Kiểm tra trùng mã nhân viên theo mã nhân viên
         /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public IEnumerable<Employee> Query(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
+        /// Author: NVDUC (26/3/2023)
+        public override bool CheckDuplicateCode(string employeeCode)
         {
-            return cnn.Query<Employee>(sql, param, transaction, buffered, commandTimeout, commandType);
-        }
+            // Chuẩn bị store
+            string checkDuplicateCode = "SELECT e.EmployeeCode FROM Employee e WHERE e.EmployeeCode = @employeeCode";
+            // Chuẩn bị các tham số đầu vào
+            var parameters = new DynamicParameters();
+            parameters.Add("@employeeCode", employeeCode);
 
-        /// <summary>
-        /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface
-        /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public Employee QueryFirstOrDefault(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-        {
-            return cnn.QueryFirstOrDefault<Employee>(sql, param, transaction, commandTimeout, commandType);
+            // Khởi tạo kết nối tới database
+            var dbConnection = GetOpenConnection();
+            var result = dbConnection.QueryFirstOrDefault<string>(checkDuplicateCode, parameters, commandType: System.Data.CommandType.Text);
+            if (result != null) {
+                return true;
+            }
+            return false;
         }
-
-        /// <summary>
-        /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface
-        /// </summary>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (20/3/2023)
-        public SqlMapper.GridReader QueryMultiple(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-        {
-            return cnn.QueryMultiple(sql, param, transaction, commandTimeout, commandType);
-        } 
         #endregion
 
     }
