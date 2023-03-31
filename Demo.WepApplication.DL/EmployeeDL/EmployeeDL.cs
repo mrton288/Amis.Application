@@ -6,9 +6,11 @@ using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
@@ -127,42 +129,71 @@ namespace Demo.WepApplication.DL.EmployeeDL
 
         public int DeleteMultiple(Guid[] listEmployeeId)
         {
+            var dbConnection = GetOpenConnection();
             // Chuẩn bị store
             string deleteMultiple = "DELETE FROM employee WHERE EmployeeId IN @listEmployeeId";
             // Chuẩn bị các tham số đầu vào
             var parameters = new DynamicParameters();
             parameters.Add("@listEmployeeId", listEmployeeId);
-
-            // Khởi tạo kết nối tới database
-            var dbConnection = GetOpenConnection();
-
             int numberRecord = dbConnection.Execute(deleteMultiple, parameters, commandType: System.Data.CommandType.Text);
             dbConnection.Close();
             return numberRecord;
         }
 
-        /// <summary>
-        /// Kiểm tra trùng mã nhân viên theo mã nhân viên
-        /// </summary>
-        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
-        /// Author: NVDUC (26/3/2023)
-        public override bool CheckDuplicateCode(string employeeCode)
+        public PagingResult<Employee> GetCoditionFilter(FilterResult filterResult, int? pageNumber, int? pageSize)
         {
-            // Chuẩn bị store
-            string checkDuplicateCode = "SELECT e.EmployeeCode FROM Employee e WHERE e.EmployeeCode = @employeeCode";
-            // Chuẩn bị các tham số đầu vào
+            string conditions = filterResult.Condition;
+            int totalRecord = 0;
+            int totalPage = 0;
+            // Chuẩn bị tên storeProcedure
+            string storedProcedureName = "Proc_employee_GetConditionFilter";
+
+            // Chuẩn bị tham số đầu vào
             var parameters = new DynamicParameters();
-            parameters.Add("@employeeCode", employeeCode);
+            parameters.Add("@v_pageNumber", pageNumber);
+            parameters.Add("@v_pageSize", pageSize);
+            parameters.Add("@v_conditions", string.Join(",", conditions));
 
-            // Khởi tạo kết nối tới database
+            // Lấy tổng số bản ghi
+            parameters.Add("@v_totalRecord", totalRecord);
+            // Lấy tổng số trang
+            parameters.Add("@v_totalPage", totalPage);
+
+            // Khởi tạo kết nối với DB
             var dbConnection = GetOpenConnection();
-            var result = dbConnection.QueryFirstOrDefault<string>(checkDuplicateCode, parameters, commandType: System.Data.CommandType.Text);
-            if (result != null) {
-                return true;
-            }
-            return false;
-        }
-        #endregion
 
+            // Thưc hiện câu lệnh sql
+            var multipleResults = dbConnection.QueryMultiple(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+
+            // Lấy danh sách nhân viên
+            var employeeList = multipleResults.Read<Employee>().ToList();
+            totalRecord = multipleResults.Read<int>().FirstOrDefault();
+            totalPage = multipleResults.Read<int>().FirstOrDefault();
+
+
+            var result = new PagingResult<Employee>
+            {
+                Data = employeeList,
+                TotalRecord = totalRecord,
+                TotalPage = totalPage,
+                CurrentPage = pageNumber,
+                CurrentPageRecords = pageSize,
+            };
+            return result;
+        }
+
+        //public PagingResult<Employee> GetCoditionFilter(FilterResult filterResult, int? pageNumber, int? pageSize)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
+
+    /// <summary>
+    /// Kiểm tra trùng mã nhân viên theo mã nhân viên
+    /// </summary>
+    /// <returns>Trả về true - trùng mã, false - không trùng</returns>
+    /// Author: NVDUC (26/3/2023)
+ 
+    #endregion
+
 }

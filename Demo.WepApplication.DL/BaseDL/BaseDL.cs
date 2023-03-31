@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
+using Demo.WepApplication.DL.EmployeeDL;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,6 @@ namespace Demo.WepApplication.DL.BaseDL
 {
     public class BaseDL<T> : IBaseDL<T>
     {
-
-
         #region Method
         /// <summary>
         /// Implement hàm mở kết nối từ interface
@@ -78,7 +77,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <summary>
         /// Thực hiện thêm mới bản ghi
         /// </summary>
-        /// <param name="newRecord"></param>
+        /// <param name="newRecord">entity</param>
         /// <returns>Id của bản ghi được thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
         public int InsertRecord(T newRecord)
@@ -162,8 +161,22 @@ namespace Demo.WepApplication.DL.BaseDL
         /// </summary>
         /// <returns>Trả về true - trùng mã, false - không trùng</returns>
         /// Author: NVDUC (26/3/2023)
-        public virtual bool CheckDuplicateCode(string recordCode)
+        public bool CheckDuplicateCode(string recordCode, Guid recordId)
         {
+            // Chuẩn bị store
+            string checkDuplicateCode = $"SELECT {typeof(T).Name}Code, {typeof(T).Name}Id FROM {typeof(T).Name}  WHERE {typeof(T).Name}Code = @{typeof(T).Name}Code AND {typeof(T).Name}Id != @{typeof(T).Name}Id";
+            // Chuẩn bị các tham số đầu vào
+            var parameters = new DynamicParameters();
+            parameters.Add($"@{typeof(T).Name}Code", recordCode);
+            parameters.Add($"@{typeof(T).Name}Id", recordId);
+
+            // Khởi tạo kết nối tới database
+            var dbConnection = GetOpenConnection();
+            var result = dbConnection.QueryFirstOrDefault<string>(checkDuplicateCode, parameters, commandType: System.Data.CommandType.Text);
+            if (result != null)
+            {
+                return true;
+            }
             return false;
         }
         #endregion

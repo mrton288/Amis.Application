@@ -60,6 +60,9 @@ namespace Demo.WepApplication.DL.BaseDL
         /// Author: NVDUC (23/3/2023)
         public int DeleteRecordById(Guid recordId);
 
+        public bool CheckDuplicateCode(string recordCode, Guid recordId);
+
+
         /* /// <summary>
     /// Thay thế cho việc khởi tạo Record
     /// </summary>

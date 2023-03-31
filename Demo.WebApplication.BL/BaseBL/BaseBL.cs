@@ -62,7 +62,11 @@ namespace Demo.WebApplication.BL.BaseBL
         /// 
         public int UpdateRecordById(Guid RecordId, T newRecord)
         {
-            return _baseDL.UpdateRecordById(RecordId, newRecord);
+            if (Validate(newRecord))
+            {
+                return _baseDL.UpdateRecordById(RecordId, newRecord);
+            }
+            return -1;
         }
 
         /// <summary>
@@ -71,22 +75,13 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public virtual int InsertRecord(T newRecord)
+        public int InsertRecord(T newRecord)
         {
-   
-            //var properties = typeof(T).GetProperties();
-            //foreach ( var property in properties)
-            //{
-            //    var propertyName = property.Name;
-            //    var propertyValue = property.GetValue(newRecord);   
-            //    var requiredAttribute = (RequiredAttribute?)property.GetCustomAttributes(typeof (RequiredAttribute), false).FirstOrDefault();
-
-            //    if (requiredAttribute != null && String.IsNullOrEmpty(propertyValue.ToString()))
-            //    {
-            //        validateFailures.Add(propertyName);
-            //    }
-            //}   
-            return _baseDL.InsertRecord(newRecord);
+            if (Validate(newRecord))
+            {
+                return _baseDL.InsertRecord(newRecord);
+            }
+            return -1;
         }
 
         /// <summary>
@@ -98,6 +93,12 @@ namespace Demo.WebApplication.BL.BaseBL
         public int DeleteRecordById(Guid RecordId)
         {
             return _baseDL.DeleteRecordById(RecordId);
+        }
+
+        public virtual bool Validate(T entity)
+        {
+  
+            return true;
         }
 
         #endregion

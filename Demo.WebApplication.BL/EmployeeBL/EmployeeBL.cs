@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace Demo.WebApplication.BL.EmployeeBL
 {
@@ -23,20 +24,20 @@ namespace Demo.WebApplication.BL.EmployeeBL
             _employeeDL = employeeDL;
         }
 
-        public override int InsertRecord(Employee employeeRecord)
+        public override bool Validate(Employee employeeRecord)
         {
 
             var validateFailures = new List<string>();
-            if (_employeeDL.CheckDuplicateCode(employeeRecord.EmployeeCode) == true)
+            if (_employeeDL.CheckDuplicateCode(employeeRecord.EmployeeCode, employeeRecord.EmployeeId) == true)
             {
                 validateFailures.Add(Common.Resources.UserMessage.UserMsg_DuplicateCode);
             }
             if (validateFailures.Count > 0)
             {
-                string errorContent = String.Join(" - ", validateFailures);
-                return (int)Common.Enums.ErrorCode.DuplicateData;
+                //string errorContent = String.Join(" - ", validateFailures);
+                return false;
             }
-            return 1;
+            return true;
 
         }
         public int DeleteMultiple(Guid[] listEmployeeId)

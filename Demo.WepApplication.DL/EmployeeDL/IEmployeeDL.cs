@@ -42,11 +42,11 @@ namespace Demo.WepApplication.DL.EmployeeDL
         /// Author: NVDUC (25/3/2023)
         public int DeleteMultiple(Guid[] listEmployeeId);
 
-        /// <summary>
-        /// Kiểm tra trùng mã nhân viên theo mã nhân viên
-        /// </summary>
-        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
-        /// Author: NVDUC (26/3/2023)
-        public bool CheckDuplicateCode(string employeeCode);
+
+        public PagingResult<Employee> GetCoditionFilter(
+          FilterResult filterResult,
+          int? pageNumber,
+          int? pageSize
+            );
     }
 }

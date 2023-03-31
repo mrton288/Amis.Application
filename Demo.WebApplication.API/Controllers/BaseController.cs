@@ -136,7 +136,7 @@ namespace Demo.WebApplication.API.Controllers
                         Data = result,
                     });
                 }
-                else
+                else if (result == 0)
                 {
                     Console.WriteLine($"Record with Id {recordId} not found.", recordId);
                     return StatusCode(StatusCodes.Status404NotFound, new ErrorResult
@@ -144,6 +144,17 @@ namespace Demo.WebApplication.API.Controllers
                         ErrorCode = ErrorCode.InvalidData,
                         DevMsg = DevMessage.DevMsg_NotFound,
                         UserMsg = UserMessage.UserMsg_NotFound,
+                        TraceId = HttpContext.TraceIdentifier
+                    });
+                }
+                else 
+                {
+                    Console.WriteLine("Record code not valid");
+                    return StatusCode(400, new ErrorResult
+                    {
+                        ErrorCode = ErrorCode.InvalidData,
+                        DevMsg = DevMessage.DevMsg_InValid,
+                        UserMsg = UserMessage.UserMsg_InValid,
                         TraceId = HttpContext.TraceIdentifier
                     });
                 }

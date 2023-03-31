@@ -1,4 +1,4 @@
-using Demo.WebApplication.BL.BaseBL;
+﻿using Demo.WebApplication.BL.BaseBL;
 using Demo.WebApplication.BL.DepartmentBL;
 using Demo.WebApplication.BL.EmployeeBL;
 using Demo.WepApplication.DL;
@@ -7,12 +7,14 @@ using Demo.WepApplication.DL.DepartmentDL;
 using Demo.WepApplication.DL.EmployeeDL;
 
 var builder = WebApplication.CreateBuilder(args);
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+// trả về JSON ParcalCase
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 }
 );
-
 
 // Add services to the container.
 
@@ -31,13 +33,19 @@ builder.Services.AddScoped<IDepartmentDL, DepartmentDL>();
 builder.Services.AddScoped(typeof(IBaseBL<>), typeof(BaseBL<>));
 builder.Services.AddScoped(typeof(IBaseDL<>), typeof(BaseDL<>));
 
-DatabaseContext.ConnectionString =  builder.Configuration.GetConnectionString("MySql");
+DatabaseContext.ConnectionString = builder.Configuration.GetConnectionString("MySql");
 
-builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
+builder.Services.AddCors(options =>
 {
-    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-}));
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -45,11 +53,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.UseCors("MyCors");
 
 app.MapControllers();
 
