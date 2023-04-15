@@ -1,4 +1,6 @@
-﻿namespace Demo.WebApplication.Common.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Demo.WebApplication.Common.Entities
 {
     public class Department
     {

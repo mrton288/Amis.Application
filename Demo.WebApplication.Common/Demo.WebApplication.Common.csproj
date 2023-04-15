@@ -7,35 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\DevMessage.Designer.cs">
+    <Compile Update="Resources\ContentMessage.Designer.cs">
+      <DependentUpon>ContentMessage.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>DevMessage.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Resources\StatusMessage.Designer.cs">
-      <DependentUpon>StatusMessage.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Update="Resources\UserMessage.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>UserMessage.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\DevMessage.resx">
+    <EmbeddedResource Update="Resources\ContentMessage.resx">
+      <LastGenOutput>ContentMessage.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>DevMessage.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\StatusMessage.resx">
-      <LastGenOutput>StatusMessage.Designer.cs</LastGenOutput>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\UserMessage.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>UserMessage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

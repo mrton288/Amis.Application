@@ -6,11 +6,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Demo.WebApplication.BL.BaseBL;
+using Microsoft.AspNetCore.Http;
 
 namespace Demo.WebApplication.BL.EmployeeBL
 {
     public interface IEmployeeBL : IBaseBL<Employee>
     {
+        #region Method 
+
+        /// <summary>
+        /// Kiểm tra các trường dữ liệu của Employee
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (4/4/2023)
+        public List<string> ValidateRequestDataCustom(Employee employee);
+
         /// <summary>
         /// Sinh ra mã nhân viên mới
         /// </summary>
@@ -39,5 +50,14 @@ namespace Demo.WebApplication.BL.EmployeeBL
         /// <returns>Số lượng Id trong danh sách</returns>
         /// Author: NVDUC (25/3/2023)
         public int DeleteMultiple(Guid[] listEmployeeId);
+
+        /// <summary>
+        /// Thực hiện chức năng xuất excel toàn bộ dữ liệu 
+        /// </summary>
+        /// <param name="employees"></param>
+        /// <returns>File excel chứa toàn bộ dữ liệu</returns>
+        /// Author: NVDUC (1/4/2023)
+        public Task<MemoryStream> ExportExcelEmployee(List<Employee> employees); 
+        #endregion
     }
 }

@@ -5,6 +5,7 @@ using Demo.WepApplication.DL;
 using Demo.WepApplication.DL.BaseDL;
 using Demo.WepApplication.DL.DepartmentDL;
 using Demo.WepApplication.DL.EmployeeDL;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -43,6 +44,12 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
         });
 });
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 
 var app = builder.Build();
 

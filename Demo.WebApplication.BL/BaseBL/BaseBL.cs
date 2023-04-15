@@ -1,6 +1,9 @@
 ﻿using Dapper;
+using Demo.WebApplication.Common.Attributes;
 using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
+using Demo.WebApplication.Common.Enums;
+using Demo.WebApplication.Common.Resources;
 using Demo.WepApplication.DL.BaseDL;
 using System;
 using System.Collections.Generic;
@@ -36,7 +39,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// </summary>
         /// <returns>Danh sách bản ghi</returns>
         /// Author: NVDUC (23/3/2023)
-        public IEnumerable<dynamic> GetAllRecord()
+        public IEnumerable<T> GetAllRecord()
         {
             return _baseDL.GetAllRecord();
         }
@@ -44,29 +47,71 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <summary>
         /// Lấy ra thông tin bản ghi
         /// </summary>
-        /// <param name="RecordId"></param>
+        /// <param name="recordId"></param>
         /// <returns>Thông tin của bản ghi đó</returns>
         /// Author: NVDUC (23/3/2023)
-        public T GetRecordById(Guid RecordId)
+        public T GetRecordById(Guid recordId)
         {
-            return _baseDL.GetRecordById(RecordId);
+            return _baseDL.GetRecordById(recordId);
         }
 
         /// <summary>
         /// Cập nhật thông tin bản ghi theo Id
         /// </summary>
-        /// <param name="RecordId"></param>
+        /// <param name="recordId"></param>
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động</returns>
         /// Author: NVDUC (23/3/2023)
-        /// 
-        public int UpdateRecordById(Guid RecordId, T newRecord)
+        public ServiceResult UpdateRecordById(Guid recordId, T newRecord)
         {
-            if (Validate(newRecord))
+            var validateFailures = ValidateRequestData(newRecord);
+            if (validateFailures.Count > 0)
             {
-                return _baseDL.UpdateRecordById(RecordId, newRecord);
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailures
+                };
             }
-            return -1;
+
+            var validateFailuresCustom = ValidateRequestDataCustom(newRecord);
+            if (validateFailuresCustom.Count > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailuresCustom
+                };
+            }
+            else
+            {
+                if (_baseDL.UpdateRecordById(recordId, newRecord) > 0)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        DevMsg = Common.Resources.ContentMessage.S_Put,
+                        UserMsg = Common.Resources.ContentMessage.S_PutEmployee,
+                        Data = newRecord
+                    };
+                }
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.NotFound,
+                        ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    };
+                }
+            }
         }
 
         /// <summary>
@@ -75,32 +120,137 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord)
+        public ServiceResult InsertRecord(T newRecord)
         {
-            if (Validate(newRecord))
+            var validateFailures = ValidateRequestData(newRecord);
+            if (validateFailures.Count > 0)
             {
-                return _baseDL.InsertRecord(newRecord);
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailures
+                };
             }
-            return -1;
+
+            var validateFailuresCustom = ValidateRequestDataCustom(newRecord);
+            if (validateFailuresCustom.Count > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailuresCustom
+                };
+            }
+            else
+            {
+                if (_baseDL.InsertRecord(newRecord) > 0)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        DevMsg = Common.Resources.ContentMessage.S_Post,
+                        UserMsg = Common.Resources.ContentMessage.S_PostEmployee,
+                        Data = newRecord
+                    };
+                }
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.NotFound,
+                        ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    };
+                }
+            }
         }
 
         /// <summary>
         /// Xoá bản ghi theo Id
         /// </summary>
-        /// <param name="RecordId"></param>
+        /// <param name="recordId"></param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public int DeleteRecordById(Guid RecordId)
+        public ServiceResult DeleteRecordById(Guid recordId)
         {
-            return _baseDL.DeleteRecordById(RecordId);
+            if (_baseDL.DeleteRecordById(recordId) > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = true,
+                    DevMsg = ContentMessage.S_Delete,
+                    UserMsg = ContentMessage.S_DeleteEmployee,
+                    Data = recordId,
+                };
+            }
+            else
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.NotFound,
+                    UserMsg = ContentMessage.NotFound,
+                    ErrorCode = ErrorCode.NotFound,
+                };
+            }
         }
 
-        public virtual bool Validate(T entity)
+        /// <summary>
+        /// Hàm validate chung kiểm tra những trường bắt buộc nhập dữ liệu
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns>Danh sách các trường để trống</returns>
+        /// Author: NVDUC (8/4/2023)
+        public List<string> ValidateRequestData(T record)
         {
-  
-            return true;
+            var validateFailures = new List<string>();
+            var properties = typeof(T).GetProperties();
+            foreach (var property in properties)
+            {
+                var propertyName = property.Name;
+                var propertyValue = property.GetValue(record);
+
+                // Kiểm tra attribute required
+                var requiredAttribute = (RequiredAttribute?)property.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault();
+                if (requiredAttribute != null && String.IsNullOrEmpty(propertyValue?.ToString()))
+                {
+                    validateFailures.Add(propertyName + Common.Resources.ContentMessage.Required);
+                }
+
+                // Kiểm tra attribute MaxLength
+                var maxLengthAttribute = (MaxLengthAttribute?)property.GetCustomAttributes(typeof(MaxLengthAttribute), false).FirstOrDefault();
+                if (maxLengthAttribute != null && propertyValue?.ToString().Length > maxLengthAttribute.Length)
+                {
+                    validateFailures.Add(propertyName + Common.Resources.ContentMessage.MaxLength);
+                }
+
+                // Kiểm tra attribute Date
+                var dateAttribute = (DateValidAttribute?)property.GetCustomAttributes(typeof(DateValidAttribute), false).FirstOrDefault();
+                if (dateAttribute != null && propertyValue is DateTime dateValue && dateValue > DateTime.Now)
+                {
+                    validateFailures.Add(propertyName + Common.Resources.ContentMessage.DateValidte);
+                }
+            }
+            return validateFailures;
         }
 
+        /// <summary>
+        /// Hàm validate cho từng đối tượng 
+        /// </summary>
+        /// <param name="record">đối tượng cần kiểm tra</param>
+        /// <returns>Danh sách các lỗi</returns>
+        /// Author: NVDUC (8/4/2023)
+        public virtual List<string> ValidateRequestDataCustom(T record)
+        {
+            return new List<string>();
+        }
         #endregion
     }
 }

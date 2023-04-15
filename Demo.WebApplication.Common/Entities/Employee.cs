@@ -1,4 +1,6 @@
-﻿using Demo.WebApplication.Common.Enums;
+﻿using Demo.WebApplication.Common.Attributes;
+using Demo.WebApplication.Common.Enums;
+using Demo.WebApplication.Common.Resources;
 using System.ComponentModel.DataAnnotations;
 
 namespace Demo.WebApplication.Common.Entities
@@ -8,18 +10,21 @@ namespace Demo.WebApplication.Common.Entities
     /// Author: NVDUC (13/3/2023)
     /// </summary>
     public class Employee
-
     {
         /// <summary>
         /// Khoá chính
         /// </summary>
         public Guid  EmployeeId { get; set; }
 
+        [Required]
+        [MaxLength(20)]
         /// <summary>
         /// Mã nhân viên
         /// </summary>
         public string EmployeeCode { get; set; }
 
+        [Required]
+        [MaxLength(100)]
         /// <summary>
         /// Tên nhân viên
         /// </summary>
@@ -30,18 +35,20 @@ namespace Demo.WebApplication.Common.Entities
         /// </summary>
         public Gender? Gender { get; set; }
 
+        [DateValid]
         /// <summary>
         /// Ngày sinh
         /// </summary>
         public DateTime? DateOfBirth { get; set; }
 
         /// <summary>
-        /// Id phòng ban
+        /// Id đơn vị
         /// </summary>
-        public Guid DepartmentId { get; set; }
+        [Required]
+        public Guid? DepartmentId { get; set; }
 
         /// <summary>
-        /// Mã phòng ban
+        /// Mã đơn vị
         /// </summary>
         public string? DepartmentCode { get; set; }
 
@@ -60,6 +67,7 @@ namespace Demo.WebApplication.Common.Entities
         /// </summary>
         public string? IdentityNumber { get; set; }
 
+        [DateValid]
         /// <summary>
         /// Ngày cấp
         /// </summary>

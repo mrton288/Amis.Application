@@ -15,7 +15,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// </summary>
         /// <returns>Danh sách bản ghi</returns>
         /// Author: NVDUC (23/3/2023)
-        public IEnumerable<dynamic> GetAllRecord();
+        public IEnumerable<T> GetAllRecord();
 
         /// <summary>
         /// Lấy ra thông tin bản ghi
@@ -33,7 +33,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <returns>Trạng thái của hành động</returns>
         /// Author: NVDUC (23/3/2023)
         /// 
-        public int UpdateRecordById(Guid recordId, T newRecord);
+        public ServiceResult UpdateRecordById(Guid recordId, T newRecord);
 
         /// <summary>
         /// Thực hiện thêm mới bản ghi
@@ -41,7 +41,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord);
+        public ServiceResult InsertRecord(T newRecord);
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -49,7 +49,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="recordId"></param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public int DeleteRecordById(Guid recordId);
+        public ServiceResult DeleteRecordById(Guid recordId);
 
     }
 }

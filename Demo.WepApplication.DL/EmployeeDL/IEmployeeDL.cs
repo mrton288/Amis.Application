@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 using System.Data;
 using Dapper;
 using Demo.WepApplication.DL.BaseDL;
+using Microsoft.AspNetCore.Http;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
     public interface IEmployeeDL : IBaseDL<Employee>
     {
+        #region Method
         /// <summary>
         /// Sinh ra mã nhân viên mới
         /// </summary>
@@ -42,11 +44,22 @@ namespace Demo.WepApplication.DL.EmployeeDL
         /// Author: NVDUC (25/3/2023)
         public int DeleteMultiple(Guid[] listEmployeeId);
 
+        /// <summary>
+        /// Thực hiện chức năng xuất excel toàn bộ dữ liệu 
+        /// </summary>
+        /// <param name="employees"></param>
+        /// <returns>File excel chứa toàn bộ dữ liệu</returns>
+        /// Author: NVDUC (1/4/2023)
+        public Task<MemoryStream> ExportExcelEmployee(List<Employee> employees);
 
-        public PagingResult<Employee> GetCoditionFilter(
-          FilterResult filterResult,
-          int? pageNumber,
-          int? pageSize
-            );
+        /// <summary>
+        /// Check trùng mã nhân viên
+        /// </summary>
+        /// <param name="employeeCode">Mã của bản ghi</param>
+        /// <param name="employeeId">Id của bản ghi</param>
+        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
+        /// Author: NVDUC (26/3/2023)
+        public bool CheckDuplicateCode(string employeeCode, Guid employeeId);
+        #endregion
     }
 }

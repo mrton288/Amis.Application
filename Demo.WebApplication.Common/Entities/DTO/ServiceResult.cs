@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Demo.WebApplication.Common.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,10 +16,19 @@ namespace Demo.WebApplication.Common.Entities.DTO
         public bool IsSuccess { get; set; }
 
         /// <summary>
-        /// Thông báo chi tiết
+        /// Trả về thông tin lỗi cho devloper
         /// </summary>
-        /// Author: NVDUC (25/3/2023)
-        public string Message { get; set; }
+        public String DevMsg { get; set; }
+
+        /// <summary>
+        /// Trả về thông tin lỗi cho người dùng
+        /// </summary>
+        public String UserMsg { get; set; }
+
+        /// <summary>
+        /// Trả về mã lỗi
+        /// </summary>
+        public ErrorCode ErrorCode { get; set; }
 
         /// <summary>
         /// Dữ liệu trả về

@@ -3,10 +3,10 @@
     public class PagingResult<T>
     {
         /// <summary>
-        /// Danh sách nhân viên 
+        /// Danh sách bản ghi
         /// </summary>
         /// Created By: NVDUC (13/3/2023)
-        public IEnumerable<T> Data { get; set; }
+        public IEnumerable<T> ListRecord { get; set; }
 
         /// <summary>
         /// Lấy ra tổng số trang

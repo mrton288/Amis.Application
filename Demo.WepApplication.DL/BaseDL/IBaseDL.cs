@@ -12,19 +12,13 @@ namespace Demo.WepApplication.DL.BaseDL
 {
     public interface IBaseDL<T>
     {
-        /// <summary>
-        /// Thực hiên mở kết nối tới database
-        /// </summary>
-        /// <returns></returns>
-        /// Author: NVDUC (13/3/2023)
-        public IDbConnection GetOpenConnection();
-
+        #region Method
         /// <summary>
         /// Trả về danh sách bản ghi
         /// </summary>
         /// <returns>Danh sách bản ghi</returns>
         /// Author: NVDUC (23/3/2023)
-        public IEnumerable<dynamic> GetAllRecord();
+        public IEnumerable<T> GetAllRecord();
 
         /// <summary>
         /// Lấy ra thông tin bản ghi
@@ -55,57 +49,10 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <summary>
         /// Xoá bản ghi theo Id
         /// </summary>
-        /// <param name="recordId"></param>
+        /// <param name="recordId">Id của bản ghi</param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
         public int DeleteRecordById(Guid recordId);
-
-        public bool CheckDuplicateCode(string recordCode, Guid recordId);
-
-
-        /* /// <summary>
-    /// Thay thế cho việc khởi tạo Record
-    /// </summary>
-    /// <returns></returns>
-    /// Author: NVDUC (20/3/2023)
-    public T QueryFirstOrDefault(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
-    /// <summary>
-    /// Thực thi câu lệnh sql và thay thế cho việc khởi tạo Record
-    /// </summary>
-    /// <param name="cnn"></param>
-    /// <param name="sql"></param>
-    /// <param name="param"></param>
-    /// <param name="transaction"></param>
-    /// <param name="commandTimeout"></param>
-    /// <param name="commandType"></param>
-    /// <returns></returns>
-    /// Author: NVDUC (20/3/2023)
-    public IEnumerable<T> Query(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null);
-
-    /// <summary>
-    /// Thực thi câu lệnh sql và thay thế cho việc khởi tạo Record
-    /// </summary>
-    /// <param name="cnn"></param>
-    /// <param name="sql"></param>
-    /// <param name="param"></param>
-    /// <param name="transaction"></param>
-    /// <param name="commandTimeout"></param>
-    /// <param name="commandType"></param>
-    /// <returns></returns>
-    /// Author: NVDUC (20/3/2023)
-    public int Execute(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
-    /// <summary>
-    /// Thực thi câu lệnh sql, trả về các đầu dữ liệu
-    /// </summary>
-    /// <param name="sql"></param>
-    /// <param name="param"></param>
-    /// <param name="transaction"></param>
-    /// <param name="commandTimeout"></param>
-    /// <param name="commandType"></param>
-    /// <returns></returns>
-    /// Author: NVDUC (20/3/2023)
-    public SqlMapper.GridReader QueryMultiple(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);*/
+        #endregion
     }
 }

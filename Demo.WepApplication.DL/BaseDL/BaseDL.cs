@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,36 +18,27 @@ namespace Demo.WepApplication.DL.BaseDL
     {
         #region Method
         /// <summary>
-        /// Implement hàm mở kết nối từ interface
-        /// </summary>
-        /// <returns></returns>
-        /// Author: NVDUC (23/3/2023)
-        public IDbConnection GetOpenConnection()
-        {
-            // Khởi tạo kết nối với DB
-            var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString);
-            mySqlConnection.Open();
-            return mySqlConnection;
-        }
-
-        /// <summary>
         /// Trả về danh sách bản ghi
         /// </summary>
         /// <returns>Danh sách bản ghi</returns>
         /// Author: NVDUC (23/3/2023)
-        public IEnumerable<dynamic> GetAllRecord()
+        public IEnumerable<T> GetAllRecord()
         {
             // Chuẩn bị tên stored
             string storedProcedureName = $"Proc_{typeof(T).Name}_GetAll";
 
             // Chuẩn bị tham số đầu vào
             // Khởi tạo kết nối với DB
-            var dbConnection = GetOpenConnection();
+            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            {
+                mySqlConnection.Open();
 
-            // Thực hiện câu lệnh sql
-            var records = dbConnection.Query(storedProcedureName, commandType: System.Data.CommandType.StoredProcedure);
-            dbConnection.Close();
-            return records;
+                // Thực hiện câu lệnh sql
+                var records = mySqlConnection.Query<T>(storedProcedureName, commandType: System.Data.CommandType.StoredProcedure);
+
+                mySqlConnection.Close();
+                return records.ToList();
+            }
         }
 
         /// <summary>
@@ -65,13 +57,16 @@ namespace Demo.WepApplication.DL.BaseDL
             parameters.Add($"@v_{typeof(T).Name}Id", recordId);
 
             // Khởi tạo kết nối tới database
-            var dbConnection = GetOpenConnection();
+            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            {
+                mySqlConnection.Open();
 
-            // Thực hiện câu lệnh sql
-            var record = dbConnection.QueryFirstOrDefault<T>(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+                // Thực hiện câu lệnh sql
+                var record = mySqlConnection.QueryFirstOrDefault<T>(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
 
-            dbConnection.Close();
-            return record;
+                mySqlConnection.Close();
+                return record;
+            }
         }
 
         /// <summary>
@@ -95,11 +90,16 @@ namespace Demo.WepApplication.DL.BaseDL
             }
 
             // Khởi tạo kết nối với DB
-            var dbConnection = GetOpenConnection();
-            // Thực hiện câu lệnh sql
-            var numberRecord = dbConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
-            dbConnection.Close();
-            return numberRecord;
+            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            {
+                mySqlConnection.Open();
+                // Thực hiện câu lệnh sql
+
+                var numberRecord = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+
+                mySqlConnection.Close();
+                return numberRecord;
+            }
         }
 
         /// <summary>
@@ -109,7 +109,6 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trả về số bản ghi bị ảnh hưởng</returns>
         /// Author: NVDUC (23/3/2023)
-        /// 
         public int UpdateRecordById(Guid recordId, T newRecord)
         {
             // Chuẩn bị tên stored
@@ -125,13 +124,16 @@ namespace Demo.WepApplication.DL.BaseDL
 
             }
             // Khởi tạo kết nối với DB
-            var dbConnection = GetOpenConnection();
+            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            {
+                mySqlConnection.Open();
+                // Thực hiện câu lệnh sql
+                var numberRecord = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
 
-            // Thực hiện câu lệnh sql
-            var numberRecord = dbConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
-            dbConnection.Close();
+                mySqlConnection.Close();
 
-            return numberRecord;
+                return numberRecord;
+            }
         }
 
         /// <summary>
@@ -150,100 +152,15 @@ namespace Demo.WepApplication.DL.BaseDL
             parameters.Add($"@v_{typeof(T).Name}Id", recordId);
 
             // Khởi tạo kết nối với DB
-            var dbConnection = GetOpenConnection();
-            var result = dbConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
-            dbConnection.Close();
-            return result;
-        }
-
-        /// <summary>
-        /// Kiểm tra trùng mã nhân viên theo mã nhân viên
-        /// </summary>
-        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
-        /// Author: NVDUC (26/3/2023)
-        public bool CheckDuplicateCode(string recordCode, Guid recordId)
-        {
-            // Chuẩn bị store
-            string checkDuplicateCode = $"SELECT {typeof(T).Name}Code, {typeof(T).Name}Id FROM {typeof(T).Name}  WHERE {typeof(T).Name}Code = @{typeof(T).Name}Code AND {typeof(T).Name}Id != @{typeof(T).Name}Id";
-            // Chuẩn bị các tham số đầu vào
-            var parameters = new DynamicParameters();
-            parameters.Add($"@{typeof(T).Name}Code", recordCode);
-            parameters.Add($"@{typeof(T).Name}Id", recordId);
-
-            // Khởi tạo kết nối tới database
-            var dbConnection = GetOpenConnection();
-            var result = dbConnection.QueryFirstOrDefault<string>(checkDuplicateCode, parameters, commandType: System.Data.CommandType.Text);
-            if (result != null)
+            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
             {
-                return true;
+                mySqlConnection.Open();
+
+                var result = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+                mySqlConnection.Close();
+                return result;
             }
-            return false;
         }
         #endregion
-
-        /* /// <summary>
-         /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface 
-         /// </summary>
-         /// <param name="cnn"></param>
-         /// <param name="sql"></param>
-         /// <param name="param"></param>
-         /// <param name="transaction"></param>
-         /// <param name="commandTimeout"></param>
-         /// <param name="commandType"></param>
-         /// <returns></returns>
-         /// Author: NVDUC (20/3/2023)
-         public int Execute(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-         {
-             return cnn.Execute(sql, param, transaction, commandTimeout, commandType);
-         }
-
-         /// <summary>
-         /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface 
-         /// Query: Dùng cho lấy tất cả bản ghi
-         /// </summary>
-         /// <param name="cnn"></param>
-         /// <param name="sql"></param>
-         /// <param name="param"></param>
-         /// <param name="transaction"></param>
-         /// <param name="commandTimeout"></param>
-         /// <param name="commandType"></param>
-         /// <returns></returns>
-         /// Author: NVDUC (20/3/2023)
-         public IEnumerable<T> Query(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
-         {
-             return cnn.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType);
-         }
-
-         /// <summary>
-         /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface
-         /// </summary>
-         /// <param name="cnn"></param>
-         /// <param name="sql"></param>
-         /// <param name="param"></param>
-         /// <param name="transaction"></param>
-         /// <param name="commandTimeout"></param>
-         /// <param name="commandType"></param>
-         /// <returns></returns>
-         /// Author: NVDUC (20/3/2023)
-         public T QueryFirstOrDefault(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-         {
-             return cnn.QueryFirstOrDefault<T>(sql, param, transaction, commandTimeout, commandType);
-         }
-
-         /// <summary>
-         /// Implement hàm thực hiện câu lệnh sql, kết nối với database từ interface
-         /// </summary>
-         /// <param name="cnn"></param>
-         /// <param name="sql"></param>
-         /// <param name="param"></param>
-         /// <param name="transaction"></param>
-         /// <param name="commandTimeout"></param>
-         /// <param name="commandType"></param>
-         /// <returns></returns>
-         /// Author: NVDUC (20/3/2023)
-         public SqlMapper.GridReader QueryMultiple(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
-         {
-             return cnn.QueryMultiple(sql, param, transaction, commandTimeout, commandType);
-         }*/
     }
 }
