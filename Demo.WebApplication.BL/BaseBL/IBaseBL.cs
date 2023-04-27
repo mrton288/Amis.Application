@@ -51,5 +51,18 @@ namespace Demo.WebApplication.BL.BaseBL
         /// Author: NVDUC (23/3/2023)
         public ServiceResult DeleteRecordById(Guid recordId);
 
+        /// <summary>
+        /// Thực hiện tìm kiếm phân trang danh sách bản ghi
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Các bản ghi trùng với điều kiện</returns>
+        /// Author: NVDUC (23/3/2023)
+        public object GetPagingRecord(
+        string? search,
+        int? pageNumber,
+        int? pageSize
+       );
     }
 }

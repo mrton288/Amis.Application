@@ -18,12 +18,12 @@ namespace Demo.WebApplication.Common.Entities.DTO
         /// <summary>
         /// Trả về thông tin lỗi cho devloper
         /// </summary>
-        public String DevMsg { get; set; }
+        public String? DevMsg { get; set; }
 
         /// <summary>
         /// Trả về thông tin lỗi cho người dùng
         /// </summary>
-        public String UserMsg { get; set; }
+        public String? UserMsg { get; set; }
 
         /// <summary>
         /// Trả về mã lỗi

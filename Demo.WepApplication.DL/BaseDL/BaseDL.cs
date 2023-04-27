@@ -3,6 +3,7 @@ using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WepApplication.DL.EmployeeDL;
 using MySqlConnector;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,19 +25,38 @@ namespace Demo.WepApplication.DL.BaseDL
         /// Author: NVDUC (23/3/2023)
         public IEnumerable<T> GetAllRecord()
         {
+            //// Chuẩn bị tên stored
+            //string storedProcedureName = $"Proc_{typeof(T).Name}_GetAll";
+
+            //// Chuẩn bị tham số đầu vào
+            //// Khởi tạo kết nối với DB
+            //using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            //{
+            //    mySqlConnection.Open();
+
+            //    // Thực hiện câu lệnh sql
+            //    var records = mySqlConnection.Query<T>(storedProcedureName, commandType: System.Data.CommandType.StoredProcedure);
+
+            //    mySqlConnection.Close();
+            //    return records.ToList();
+            //}
+
             // Chuẩn bị tên stored
-            string storedProcedureName = $"Proc_{typeof(T).Name}_GetAll";
+            string storedFunctionName = $"Func_{typeof(T).Name}_getall()";
+
+            string queryString = $"select * from {storedFunctionName}";
 
             // Chuẩn bị tham số đầu vào
             // Khởi tạo kết nối với DB
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+
+            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
             {
-                mySqlConnection.Open();
+                postgreSQL.Open();
 
                 // Thực hiện câu lệnh sql
-                var records = mySqlConnection.Query<T>(storedProcedureName, commandType: System.Data.CommandType.StoredProcedure);
+                var records = postgreSQL.Query<T>(queryString, commandType: System.Data.CommandType.Text);
 
-                mySqlConnection.Close();
+                postgreSQL.Close();
                 return records.ToList();
             }
         }
@@ -50,21 +70,21 @@ namespace Demo.WepApplication.DL.BaseDL
         public T GetRecordById(Guid recordId)
         {
             // Chuẩn bị tên stored
-            string storedProcedureName = $"Proc_{typeof(T).Name}_GetById";
+            string queryString = $"select * from func_{typeof(T).Name}_get_by_id('{recordId}')";
 
             // Chuẩn bị tham số đầu vào
             var parameters = new DynamicParameters();
-            parameters.Add($"@v_{typeof(T).Name}Id", recordId);
+            parameters.Add($"@id_{typeof(T).Name}_select", recordId);
 
             // Khởi tạo kết nối tới database
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
+            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
             {
-                mySqlConnection.Open();
+                postgreSQL.Open();
 
                 // Thực hiện câu lệnh sql
-                var record = mySqlConnection.QueryFirstOrDefault<T>(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+                var record = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
 
-                mySqlConnection.Close();
+                postgreSQL.Close();
                 return record;
             }
         }
@@ -159,6 +179,28 @@ namespace Demo.WepApplication.DL.BaseDL
                 var result = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
                 mySqlConnection.Close();
                 return result;
+            }
+        }
+        public object GetPagingRecord(string? search, int? pageNumber, int? pageSize)
+        {
+            //Chuẩn bị tên stored
+            string storedFunctionName = $"func_{typeof(T).Name}_getpaging";
+
+            search ??= "";
+
+            string queryString = $"select * from {storedFunctionName}('', {pageNumber}, {pageSize})";
+
+            // Khởi tạo kết nối với DB
+            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
+
+            {
+                postgreSQL.Open();
+
+                // Thưc hiện câu lệnh sql
+                var records = postgreSQL.Query(queryString, commandType: System.Data.CommandType.Text);
+
+                postgreSQL.Close();
+                return records;
             }
         }
         #endregion

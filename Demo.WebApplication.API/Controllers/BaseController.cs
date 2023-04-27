@@ -36,16 +36,16 @@ namespace Demo.WebApplication.API.Controllers
         {
             try
             {
-                var employees = _baseBL.GetAllRecord();
+                var records = _baseBL.GetAllRecord();
                 // Thành công
-                if (employees != null)
+                if (records != null)
                 {
                     return new ServiceResult
                     {
                         IsSuccess = true,
                         DevMsg = ContentMessage.S_Get,
                         UserMsg = ContentMessage.S_GetEmployee,
-                        Data = employees,
+                        Data = records,
                     };
                 }
                 // Thất bại
@@ -184,6 +184,50 @@ namespace Demo.WebApplication.API.Controllers
             try
             {
                 return _baseBL.DeleteRecordById(recordId);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
+
+
+        [HttpGet("pagingRecord")]
+        public ServiceResult GetPagingRecord([FromQuery]string? search,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10)
+        {
+            try
+            {
+                var records = _baseBL.GetPagingRecord(search, pageNumber, pageSize);
+                // Thành công
+                if (records != null)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        DevMsg = ContentMessage.S_Get,
+                        UserMsg = ContentMessage.S_GetEmployee,
+                        Data = records,
+                    };
+                }
+                // Thất bại
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = ContentMessage.NotFound,
+                        UserMsg = ContentMessage.NotFound,
+                        ErrorCode = ErrorCode.NotFound,
+                    };
+                }
             }
             catch
             {
