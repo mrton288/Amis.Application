@@ -20,14 +20,15 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    //options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
 }
 );
 
 // Add services to the container.
 
-builder.Services.AddControllers()
-.AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition =
-System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull);
+builder.Services.AddControllers();
+//.AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition =
+//System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

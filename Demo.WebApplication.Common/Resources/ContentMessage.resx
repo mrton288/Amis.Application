@@ -123,11 +123,17 @@
   <data name="DepartmentValidate" xml:space="preserve">
     <value>Đơn vị không hợp lệ.</value>
   </data>
+  <data name="DuplicateAccount" xml:space="preserve">
+    <value>Trùng số tài khoản.</value>
+  </data>
   <data name="DuplicateCode" xml:space="preserve">
     <value>Trùng mã nhân viên.</value>
   </data>
   <data name="Exception" xml:space="preserve">
     <value>Có lỗi xảy ra phía máy chủ.</value>
+  </data>
+  <data name="E_DeleteAccount" xml:space="preserve">
+    <value>Xoá tài khoản không thành công.</value>
   </data>
   <data name="InValid" xml:space="preserve">
     <value>Dữ liệu đầu vào không hợp lệ.</value>
@@ -136,13 +142,16 @@
     <value> có độ dài vượt qua mức quy định.</value>
   </data>
   <data name="NotFound" xml:space="preserve">
-    <value>Không tìm thấy nhân viên.</value>
+    <value>Không tìm thấy bản ghi.</value>
   </data>
   <data name="Required" xml:space="preserve">
     <value> không được phép trống.</value>
   </data>
   <data name="S_Delete" xml:space="preserve">
     <value>Xoá thành công</value>
+  </data>
+  <data name="S_DeleteAccount" xml:space="preserve">
+    <value>Tài khoản đã bị xoá.</value>
   </data>
   <data name="S_DeleteEmployee" xml:space="preserve">
     <value>Nhân viên đã bị xoá.</value>

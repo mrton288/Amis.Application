@@ -36,7 +36,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <returns>Trạng thái của hành động</returns>
         /// Author: NVDUC (23/3/2023)
         /// 
-        public int UpdateRecordById(Guid recordId, T newRecord);
+        public T UpdateRecordById(Guid recordId, T newRecord);
 
         /// <summary>
         /// Thực hiện thêm mới bản ghi
@@ -44,7 +44,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord);
+        public T InsertRecord(T newRecord);
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -52,7 +52,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="recordId">Id của bản ghi</param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public int DeleteRecordById(Guid recordId);
+        public T DeleteRecordById(Guid recordId);
 
 
         /// <summary>

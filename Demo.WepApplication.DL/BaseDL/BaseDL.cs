@@ -25,40 +25,20 @@ namespace Demo.WepApplication.DL.BaseDL
         /// Author: NVDUC (23/3/2023)
         public IEnumerable<T> GetAllRecord()
         {
-            //// Chuẩn bị tên stored
-            //string storedProcedureName = $"Proc_{typeof(T).Name}_GetAll";
-
-            //// Chuẩn bị tham số đầu vào
-            //// Khởi tạo kết nối với DB
-            //using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
-            //{
-            //    mySqlConnection.Open();
-
-            //    // Thực hiện câu lệnh sql
-            //    var records = mySqlConnection.Query<T>(storedProcedureName, commandType: System.Data.CommandType.StoredProcedure);
-
-            //    mySqlConnection.Close();
-            //    return records.ToList();
-            //}
-
             // Chuẩn bị tên stored
             string storedFunctionName = $"Func_{typeof(T).Name}_getall()";
 
             string queryString = $"select * from {storedFunctionName}";
 
-            // Chuẩn bị tham số đầu vào
             // Khởi tạo kết nối với DB
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
 
-            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
-            {
-                postgreSQL.Open();
+            // Thực hiện câu lệnh sql
+            var records = postgreSQL.Query<T>(queryString, commandType: System.Data.CommandType.Text);
 
-                // Thực hiện câu lệnh sql
-                var records = postgreSQL.Query<T>(queryString, commandType: System.Data.CommandType.Text);
-
-                postgreSQL.Close();
-                return records.ToList();
-            }
+            postgreSQL.Close();
+            return records.ToList();
         }
 
         /// <summary>
@@ -70,23 +50,21 @@ namespace Demo.WepApplication.DL.BaseDL
         public T GetRecordById(Guid recordId)
         {
             // Chuẩn bị tên stored
-            string queryString = $"select * from func_{typeof(T).Name}_get_by_id('{recordId}')";
+            string queryString = $"select * from func_{typeof(T).Name}_get_by_id(@id_{typeof(T).Name}_select)";
 
             // Chuẩn bị tham số đầu vào
             var parameters = new DynamicParameters();
             parameters.Add($"@id_{typeof(T).Name}_select", recordId);
 
             // Khởi tạo kết nối tới database
-            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
-            {
-                postgreSQL.Open();
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
 
-                // Thực hiện câu lệnh sql
-                var record = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
+            // Thực hiện câu lệnh sql
+            var record = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
 
-                postgreSQL.Close();
-                return record;
-            }
+            postgreSQL.Close();
+            return record;
         }
 
         /// <summary>
@@ -95,31 +73,69 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord">entity</param>
         /// <returns>Id của bản ghi được thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord)
+        public T InsertRecord(T newRecord)
         {
-            // Validate dữ liệu 
             // Chuẩn bị tên stored
-            string storedProcedureName = $"Proc_{typeof(T).Name}_Add";
+            string functionName = $"func_{typeof(T).Name}_add";
+
+            // Build query string 
+            var stringParam = new StringBuilder("");
+            //Guid newRecordId = Guid.NewGuid();
 
             // Chuẩn bị tham số đầu vào
-            var properties = typeof(T).GetProperties();
             var parameters = new DynamicParameters();
+            var properties = typeof(T).GetProperties();
+
             foreach (var property in properties)
             {
-                parameters.Add($"@v_{property.Name}", property.GetValue(newRecord));
+                var propName = property.Name;
+                var propValue = property.GetValue(newRecord);
+                parameters.Add($"@v_{propName}", propValue);
+
+                //if (propName == $"{typeof(T).Name}_id".ToLower())
+                //{
+                //    stringParam.Append($"'{newRecordId}'");
+                //}
+
+                //else if (property.PropertyType == typeof(Guid?) && propValue is null or (object)"")
+                //{
+                //    stringParam.Append(",null");
+                //}
+                //else if (propName == "modified_date" || propName == "created_date")
+                //{
+                //    stringParam.Append($",'{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")}'");
+                //}
+                //else
+                //{
+                //    if (property.PropertyType == typeof(int?))
+                //    {
+                //        stringParam.Append($",{propValue}");
+                //    }
+                //    else
+                //    {
+                //        stringParam.Append($",'{propValue}'");
+                //    }
+                //}
+                if (propName == "modified_by")
+                {
+                    stringParam.Append($"@v_{propName}");
+                }
+                else
+                {
+                    stringParam.Append($"@v_{propName},");
+                }
             }
 
+            string stringQuery = $"select * from {functionName}({stringParam})";
             // Khởi tạo kết nối với DB
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
-            {
-                mySqlConnection.Open();
-                // Thực hiện câu lệnh sql
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
+            // Thực hiện câu lệnh sql
+            var record = postgreSQL.QueryFirstOrDefault<T>(stringQuery, parameters, commandType: System.Data.CommandType.Text);
 
-                var numberRecord = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+            postgreSQL.Close();
 
-                mySqlConnection.Close();
-                return numberRecord;
-            }
+            return record;
         }
 
         /// <summary>
@@ -129,31 +145,58 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trả về số bản ghi bị ảnh hưởng</returns>
         /// Author: NVDUC (23/3/2023)
-        public int UpdateRecordById(Guid recordId, T newRecord)
+        public T UpdateRecordById(Guid recordId, T newRecord)
         {
             // Chuẩn bị tên stored
-            string storedProcedureName = $"Proc_{typeof(T).Name}_UpdateById";
+            string functionName = $"func_{typeof(T).Name}_update_by_id";
 
-            // Chuẩn bị tham số đầu vào
-            var parameters = new DynamicParameters();
+            // Build query string 
+            var stringParam = new StringBuilder("");
+
             var properties = typeof(T).GetProperties();
 
             foreach (var property in properties)
             {
-                parameters.Add($"@v_{property.Name}", property.GetValue(newRecord));
+                var propName = property.Name;
+                var propValue = property.GetValue(newRecord);
 
+                if (propName == $"{typeof(T).Name}_id".ToLower())
+                {
+                    stringParam.Append($"'{recordId}'");
+                }
+
+                else if (property.PropertyType == typeof(Guid?) && propValue is null or (object)"")
+                {
+                    stringParam.Append(",null");
+                }
+                else if (propName == "modified_date" || propName == "created_date")
+                {
+                    stringParam.Append($",'{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")}'");
+                }
+                else
+                {
+                    if (property.PropertyType == typeof(int?))
+                    {
+                        stringParam.Append($",{propValue}");
+                    }
+                    else
+                    {
+                        stringParam.Append($",'{propValue}'");
+                    }
+                }
             }
+
+            string stringQuery = $"select * from {functionName}({stringParam})";
+
             // Khởi tạo kết nối với DB
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
-            {
-                mySqlConnection.Open();
-                // Thực hiện câu lệnh sql
-                var numberRecord = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
+            // Thực hiện câu lệnh sql
+            var record = postgreSQL.QueryFirstOrDefault<T>(stringQuery, commandType: System.Data.CommandType.Text);
 
-                mySqlConnection.Close();
+            postgreSQL.Close();
 
-                return numberRecord;
-            }
+            return record;
         }
 
         /// <summary>
@@ -162,24 +205,22 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="recordId"></param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public int DeleteRecordById(Guid recordId)
+        public T DeleteRecordById(Guid recordId)
         {
             //Chuẩn bị tên stored
-            string storedProcedureName = $"Proc_{typeof(T).Name}_DeleteById";
+            string queryString = $"SELECT * FROM func_{typeof(T).Name}_delete_by_id(@id_{typeof(T).Name}_select)";
 
             // Chuẩn bị tham số đầu vào
             var parameters = new DynamicParameters();
-            parameters.Add($"@v_{typeof(T).Name}Id", recordId);
+            parameters.Add($"@id_{typeof(T).Name}_select", recordId);
 
             // Khởi tạo kết nối với DB
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
-            {
-                mySqlConnection.Open();
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
 
-                var result = mySqlConnection.Execute(storedProcedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
-                mySqlConnection.Close();
-                return result;
-            }
+            var result = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
+            postgreSQL.Close();
+            return result;
         }
         public object GetPagingRecord(string? search, int? pageNumber, int? pageSize)
         {
@@ -188,7 +229,7 @@ namespace Demo.WepApplication.DL.BaseDL
 
             search ??= "";
 
-            string queryString = $"select * from {storedFunctionName}('', {pageNumber}, {pageSize})";
+            string queryString = $"select * from {storedFunctionName}('{search}', {pageNumber}, {pageSize})";
 
             // Khởi tạo kết nối với DB
             using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))

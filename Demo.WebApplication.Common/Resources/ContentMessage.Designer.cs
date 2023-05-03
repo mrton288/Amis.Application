@@ -79,11 +79,29 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trùng số tài khoản..
+        /// </summary>
+        public static string DuplicateAccount {
+            get {
+                return ResourceManager.GetString("DuplicateAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Trùng mã nhân viên..
         /// </summary>
         public static string DuplicateCode {
             get {
                 return ResourceManager.GetString("DuplicateCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xoá tài khoản không thành công..
+        /// </summary>
+        public static string E_DeleteAccount {
+            get {
+                return ResourceManager.GetString("E_DeleteAccount", resourceCulture);
             }
         }
         
@@ -115,7 +133,7 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không tìm thấy nhân viên..
+        ///   Looks up a localized string similar to Không tìm thấy bản ghi..
         /// </summary>
         public static string NotFound {
             get {
@@ -138,6 +156,15 @@ namespace Demo.WebApplication.Common.Resources {
         public static string S_Delete {
             get {
                 return ResourceManager.GetString("S_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tài khoản đã bị xoá..
+        /// </summary>
+        public static string S_DeleteAccount {
+            get {
+                return ResourceManager.GetString("S_DeleteAccount", resourceCulture);
             }
         }
         

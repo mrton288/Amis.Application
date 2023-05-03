@@ -91,7 +91,7 @@ namespace Demo.WebApplication.BL.BaseBL
             }
             else
             {
-                if (_baseDL.UpdateRecordById(recordId, newRecord) > 0)
+                if (_baseDL.UpdateRecordById(recordId, newRecord) != null)
                 {
                     return new ServiceResult
                     {
@@ -149,7 +149,7 @@ namespace Demo.WebApplication.BL.BaseBL
             }
             else
             {
-                if (_baseDL.InsertRecord(newRecord) > 0)
+                if (_baseDL.InsertRecord(newRecord) != null)
                 {
                     return new ServiceResult
                     {
@@ -180,7 +180,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// Author: NVDUC (23/3/2023)
         public ServiceResult DeleteRecordById(Guid recordId)
         {
-            if (_baseDL.DeleteRecordById(recordId) > 0)
+            if (_baseDL.DeleteRecordById(recordId) != null)
             {
                 return new ServiceResult
                 {

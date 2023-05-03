@@ -13,7 +13,7 @@ namespace Demo.WebApplication.Common.Entities.DTO
         /// Trả về trạng thái có thành công hay không
         /// </summary>
         /// Author: NVDUC (25/3/2023)
-        public bool IsSuccess { get; set; }
+        public bool? IsSuccess { get; set; }
 
         /// <summary>
         /// Trả về thông tin lỗi cho devloper
@@ -28,12 +28,12 @@ namespace Demo.WebApplication.Common.Entities.DTO
         /// <summary>
         /// Trả về mã lỗi
         /// </summary>
-        public ErrorCode ErrorCode { get; set; }
+        public ErrorCode? ErrorCode { get; set; }
 
         /// <summary>
         /// Dữ liệu trả về
         /// </summary>
         /// Author: NVDUC (25/3/2023)
-        public object Data { get; set; }
+        public object? Data { get; set; }
     }
 }
