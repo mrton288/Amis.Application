@@ -173,6 +173,32 @@ namespace Demo.WebApplication.API.Controllers
         }
 
         /// <summary>
+        /// Api thêm một bản ghi mới
+        /// </summary>
+        /// <param name="newRecord"></param>
+        /// <returns>Trả về trạng thái thêm mới</returns>
+        /// Created By: NVDUC (13/3/2023)
+        [HttpPost("insertMultiple")]
+        public ServiceResult InsertMultiple([FromBody] IEnumerable<T> records)
+        {
+            try
+            {
+                //TODO: Hàm insert 
+                return _baseBL.InsertMultiple(records);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
+
+        /// <summary>
         /// Xoá một bản ghi theo Id
         /// </summary>
         /// <param name="recordId"></param>

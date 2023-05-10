@@ -15,14 +15,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
         #region Method 
 
         /// <summary>
-        /// Kiểm tra các trường dữ liệu của Employee
-        /// </summary>
-        /// <param name="employee"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (4/4/2023)
-        public List<string> ValidateRequestDataCustom(Employee employee);
-
-        /// <summary>
         /// Sinh ra mã nhân viên mới
         /// </summary>
         /// <returns>Mã nhân viên mới</returns>
@@ -51,13 +43,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
         /// Author: NVDUC (25/3/2023)
         public int DeleteMultiple(Guid[] listEmployeeId);
 
-        /// <summary>
-        /// Thực hiện chức năng xuất excel toàn bộ dữ liệu 
-        /// </summary>
-        /// <param name="employees"></param>
-        /// <returns>File excel chứa toàn bộ dữ liệu</returns>
-        /// Author: NVDUC (1/4/2023)
-        public Task<MemoryStream> ExportExcelEmployee(List<Employee> employees); 
         #endregion
     }
 }

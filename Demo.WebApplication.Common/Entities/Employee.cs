@@ -14,123 +14,123 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Khoá chính
         /// </summary>
-        public Guid  EmployeeId { get; set; }
+        public Guid employee_id { get; set; }
 
         [Required]
         [MaxLength(20)]
         /// <summary>
         /// Mã nhân viên
         /// </summary>
-        public string EmployeeCode { get; set; }
+        public string employee_code { get; set; }
 
         [Required]
         [MaxLength(100)]
         /// <summary>
         /// Tên nhân viên
         /// </summary>
-        public string FullName { get; set; }
+        public string full_name { get; set; }
 
         /// <summary>
         /// Giới tính
         /// </summary>
-        public Gender? Gender { get; set; }
+        public Gender? gender { get; set; }
 
         [DateValid]
         /// <summary>
         /// Ngày sinh
         /// </summary>
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime? date_of_birth { get; set; }
 
         /// <summary>
         /// Id đơn vị
         /// </summary>
         [Required]
-        public Guid? DepartmentId { get; set; }
+        public Guid? department_id { get; set; }
 
         /// <summary>
         /// Mã đơn vị
         /// </summary>
-        public string? DepartmentCode { get; set; }
+        public string? department_code { get; set; }
 
         /// <summary>
         /// Tên phòng ban
         /// </summary>
-        public string? DepartmentName { get; set; }
+        public string? department_name { get; set; }
 
         /// <summary>
         /// Chức danh
         /// </summary>
-        public string? PositionName { get; set; }
+        public string? position_name { get; set; }
 
         /// <summary>
         /// Số chứng minh thư nhân dân
         /// </summary>
-        public string? IdentityNumber { get; set; }
+        public string? identity_number { get; set; }
 
         [DateValid]
         /// <summary>
         /// Ngày cấp
         /// </summary>
-        public DateTime? IdentityDate { get; set; }
+        public DateTime? identity_date { get; set; }
 
         /// <summary>
         /// Nơi cấp
         /// </summary>
-        public string? IdentityPlace { get; set; }
+        public string? identity_place { get; set; }
 
         /// <summary>
         /// Địa chỉ
         /// </summary>
-        public string? Address { get; set; }
+        public string? address { get; set; }
 
         /// <summary>
         /// Điện thoại di động
         /// </summary>
-        public string? PhoneNumber { get; set; }
+        public string? phone_number { get; set; }
 
         /// <summary>
         /// Điện thoại cố định
         /// </summary>
-        public string? Landline { get; set; }
+        public string? landline { get; set; }
 
         /// <summary>
         /// Email
         /// </summary>
-        public string? Email { get; set; }
+        public string? email { get; set; }
 
         /// <summary>
         /// Tài khoản ngân hàng
         /// </summary>
-        public string? BankAccount { get; set; }
+        public string? bank_account { get; set; }
 
         /// <summary>
         /// Tên ngân hàng
         /// </summary>
-        public string? BankName { get; set; }
+        public string? bank_name { get; set; }
 
         /// <summary>
         /// Chi nhánh
         /// </summary>
-        public string? BankBranch { get; set; }
+        public string? bank_branch { get; set; }
 
         /// <summary>
         /// Ngày tạo
         /// </summary>
-        public DateTime? CreatedDate { get; set; }
+        public DateTime? created_date { get; set; }
 
         /// <summary>
         /// Người tạo
         /// </summary>
-        public string? CreatedBy { get; set; }
+        public string? created_by { get; set; }
 
         /// <summary>
-        /// Ngày sửa
+        /// Ngày chỉnh sửa
         /// </summary>
-        public DateTime? ModifiedDate {get; set; }
+        public DateTime? modified_date { get; set; }
 
         /// <summary>
-        /// Người sửa
+        /// Người chỉnh sửa
         /// </summary>
-        public string? ModifiedBy { get; set; }
+        public string? modified_by { get; set; }
     }
 }

@@ -96,8 +96,7 @@ namespace Demo.WebApplication.BL.BaseBL
                     return new ServiceResult
                     {
                         IsSuccess = true,
-                        DevMsg = Common.Resources.ContentMessage.S_Put,
-                        UserMsg = Common.Resources.ContentMessage.S_PutEmployee,
+                        UserMsg = Common.Resources.ContentMessage.S_Put,
                         Data = newRecord
                     };
                 }
@@ -107,7 +106,7 @@ namespace Demo.WebApplication.BL.BaseBL
                     {
                         IsSuccess = false,
                         DevMsg = Common.Resources.ContentMessage.NotFound,
-                        UserMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.E_Put,
                         ErrorCode = Common.Enums.ErrorCode.NotFound,
                     };
                 }
@@ -149,13 +148,12 @@ namespace Demo.WebApplication.BL.BaseBL
             }
             else
             {
-                if (_baseDL.InsertRecord(newRecord) != null)
+                if (_baseDL.InsertRecord(newRecord) != 0)
                 {
                     return new ServiceResult
                     {
                         IsSuccess = true,
-                        DevMsg = Common.Resources.ContentMessage.S_Post,
-                        UserMsg = Common.Resources.ContentMessage.S_PostEmployee,
+                        UserMsg = Common.Resources.ContentMessage.S_Post,
                         Data = newRecord
                     };
                 }
@@ -165,12 +163,69 @@ namespace Demo.WebApplication.BL.BaseBL
                     {
                         IsSuccess = false,
                         DevMsg = Common.Resources.ContentMessage.NotFound,
-                        UserMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.E_Post,
                         ErrorCode = Common.Enums.ErrorCode.NotFound,
                     };
                 }
             }
         }
+
+        /// <summary>
+        /// Thực hiện thêm mới nhiều bản ghi
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        public ServiceResult InsertMultiple(IEnumerable<T> records)
+        {
+            //var validateFailures = ValidateRequestData(newRecord);
+            //if (validateFailures.Count > 0)
+            //{
+            //    return new ServiceResult
+            //    {
+            //        IsSuccess = false,
+            //        DevMsg = Common.Resources.ContentMessage.InValid,
+            //        UserMsg = Common.Resources.ContentMessage.InValid,
+            //        ErrorCode = Common.Enums.ErrorCode.InvalidData,
+            //        Data = validateFailures
+            //    };
+            //}
+
+            //var validateFailuresCustom = ValidateRequestDataCustom(newRecord);
+            //if (validateFailuresCustom.Count > 0)
+            //{
+            //    return new ServiceResult
+            //    {
+            //        IsSuccess = false,
+            //        DevMsg = Common.Resources.ContentMessage.InValid,
+            //        UserMsg = Common.Resources.ContentMessage.InValid,
+            //        ErrorCode = Common.Enums.ErrorCode.InvalidData,
+            //        Data = validateFailuresCustom
+            //    };
+            //}
+            //else
+            //{
+                if (_baseDL.InsertMultiple(records) != 0)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        UserMsg = Common.Resources.ContentMessage.S_Post,
+                        Data = records
+                    };
+                }
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.E_Post,
+                        ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    };
+                //}
+            }
+        }
+
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -208,7 +263,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="record"></param>
         /// <returns>Danh sách các trường để trống</returns>
         /// Author: NVDUC (8/4/2023)
-        public List<string> ValidateRequestData(T record)
+        public List<string> ValidateRequestData(T? record)
         {
             var validateFailures = new List<string>();
             var properties = typeof(T).GetProperties();
@@ -268,6 +323,7 @@ namespace Demo.WebApplication.BL.BaseBL
         {
             return _baseDL.GetPagingRecord(search, pageNumber, pageSize);  
         }
+
         #endregion
     }
 }

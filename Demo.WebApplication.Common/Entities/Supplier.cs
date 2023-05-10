@@ -6,47 +6,37 @@ using System.Threading.Tasks;
 
 namespace Demo.WebApplication.Common.Entities
 {
-    public class PayDetail
+    public class Supplier
     {
         /// <summary>
-        /// Id chi tiền chi tiết
+        /// Id Nhà cung cấp
         /// </summary>
-        public Guid pay_detail_id { get; set; }
+        public Guid supplier_id { get; set; }
 
         /// <summary>
-        /// Id chi tiền
+        /// Mã số thuế
         /// </summary>
-        public Guid? pay_id { get; set; }
+        public string? tax_code { get; set; }
 
         /// <summary>
-        /// Diễn giải
+        /// Mã nhà cung cấp
         /// </summary>
-        public string? description { get; set; }
+        public string? supplier_code { get; set; }
 
         /// <summary>
-        /// Tài khoản nợ
+        /// Tên nhà cung cấp
         /// </summary>
-        public string debit_account { get; set; }
+        public string? supplier_name { get; set; }
 
         /// <summary>
-        /// Tài khoản có
+        /// Địa chỉ
         /// </summary>
-        public string credit_account { get; set; }
+        public string? address { get; set; }
 
         /// <summary>
-        /// Số tiền
+        /// Số điện thoại
         /// </summary>
-        public decimal? amount_money { get; set; }
-
-        /// <summary>
-        /// Mã đối tượng
-        /// </summary>
-        public string? object_code { get; set; }
-
-        /// <summary>
-        /// Tên đối tượng
-        /// </summary>
-        public string? object_name { get; set; }
+        public string? phone_number { get; set; }
 
         /// <summary>
         /// Ngày tạo

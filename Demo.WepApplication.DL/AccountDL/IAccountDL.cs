@@ -53,5 +53,16 @@ namespace Demo.WepApplication.DL.AccountDL
         /// <returns>Trả về true - trùng mã, false - không trùng</returns>
         /// Author: NVDUC (29/4/2023)
         public bool CheckDuplicateAccount(string accountNumber, Guid accountId);
+
+
+        /// <summary>
+        /// Cập nhật trạng thái nhiều tài khoản
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (05/05/2023)
+        public int UpdateMultipleStatus(Guid[] ids, int newStatus);
+      
     }
 }

@@ -119,5 +119,29 @@ namespace Demo.WepApplication.DL.AccountDL
             }
             return false;
         }
+
+        /// <summary>
+        /// Cập nhật trạng thái nhiều tài khoản
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (05/05/2023)
+        public int UpdateMultipleStatus(Guid[] ids, int newStatus)  
+        {
+            // Chuẩn bị các tham số đầu vào
+            var parameters = new DynamicParameters();
+            parameters.Add("@listAccountId", ids);
+            parameters.Add("@newStatus", newStatus);
+
+            string queryString = $"select * from func_account_update_status_multiple(@listAccountId, @newStatus);";
+
+            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+            postgreSQL.Open();
+            int result = postgreSQL.QueryFirstOrDefault<int>(queryString,parameters, commandType: System.Data.CommandType.Text);
+            postgreSQL.Close();
+
+            return result;
+        }
     }
 }

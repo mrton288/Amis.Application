@@ -37,7 +37,6 @@ namespace Demo.WebApplication.BL.AccountBL
         /// Author: NVDUC (29/04/2023)
         public ServiceResult UpdateParent(Guid id ,int isParent);
 
-
         /// <summary>
         /// Trả về danh sách các tài khoản con của tài khoản
         /// </summary>
@@ -46,7 +45,6 @@ namespace Demo.WebApplication.BL.AccountBL
         /// Author: NVDUC (29/04/2023)
         public ServiceResult GetListChild(Guid id);
 
-
         /// <summary>
         /// Kiểm tra các trường dữ liệu của Account
         /// </summary>
@@ -54,5 +52,15 @@ namespace Demo.WebApplication.BL.AccountBL
         /// <returns></returns>
         /// Author: NVDUC (24/4/2023)
         public List<string> ValidateRequestDataCustom(Account account);
+
+        /// <summary>
+        /// Cập nhật trạng thái nhiều tài khoản
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (05/05/2023)
+        public ServiceResult UpdateMultipleStatus(Guid[] ids, int newStatus);
+
     }
 }

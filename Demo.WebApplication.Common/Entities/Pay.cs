@@ -36,7 +36,7 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Số tiền
         /// </summary>
-        public int? amount_money { get; set; }
+        public decimal? amount_money { get; set; }
 
         /// <summary>
         /// Tên đối tượng
@@ -52,6 +52,21 @@ namespace Demo.WebApplication.Common.Entities
         /// Địa chỉ
         /// </summary>
         public string? address { get; set; }
+
+        /// <summary>
+        /// Người nhận
+        /// </summary>
+        public string? receiver { get; set; }
+
+        /// <summary>
+        /// Tên nhân viên
+        /// </summary>
+        public string? employee_name { get; set; }
+
+        /// <summary>
+        /// Kèm theo (số lượng)
+        /// </summary>
+        public int? quantity { get; set; }
 
         /// <summary>
         /// Ngày tạo

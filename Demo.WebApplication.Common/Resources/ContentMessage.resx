@@ -135,6 +135,12 @@
   <data name="E_DeleteAccount" xml:space="preserve">
     <value>Xoá tài khoản không thành công.</value>
   </data>
+  <data name="E_Post" xml:space="preserve">
+    <value>Thêm mới không thành công.</value>
+  </data>
+  <data name="E_Put" xml:space="preserve">
+    <value>Sửa không thành công.</value>
+  </data>
   <data name="InValid" xml:space="preserve">
     <value>Dữ liệu đầu vào không hợp lệ.</value>
   </data>
@@ -163,13 +169,13 @@
     <value>Lấy dữ liệu nhân viên thành công.</value>
   </data>
   <data name="S_Post" xml:space="preserve">
-    <value>Thêm mới thành công</value>
+    <value>Dữ liệu đã được thêm mới.</value>
   </data>
   <data name="S_PostEmployee" xml:space="preserve">
     <value>Nhân viên đã được thêm mới.</value>
   </data>
   <data name="S_Put" xml:space="preserve">
-    <value>Sửa thành công</value>
+    <value>Dữ liệu đã sửa.</value>
   </data>
   <data name="S_PutEmployee" xml:space="preserve">
     <value>Nhân viên đã được sửa.</value>

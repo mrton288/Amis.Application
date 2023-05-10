@@ -106,6 +106,24 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thêm mới không thành công..
+        /// </summary>
+        public static string E_Post {
+            get {
+                return ResourceManager.GetString("E_Post", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sửa không thành công..
+        /// </summary>
+        public static string E_Put {
+            get {
+                return ResourceManager.GetString("E_Put", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Có lỗi xảy ra phía máy chủ..
         /// </summary>
         public static string Exception {
@@ -196,7 +214,7 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thêm mới thành công.
+        ///   Looks up a localized string similar to Dữ liệu đã được thêm mới..
         /// </summary>
         public static string S_Post {
             get {
@@ -214,7 +232,7 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sửa thành công.
+        ///   Looks up a localized string similar to Dữ liệu đã sửa..
         /// </summary>
         public static string S_Put {
             get {

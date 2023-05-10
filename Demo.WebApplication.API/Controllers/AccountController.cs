@@ -122,5 +122,32 @@ namespace Demo.WebApplication.API.Controllers
                 };
             }
         }
+
+
+        /// <summary>
+        /// Cập nhật trạng thái nhiều tài khoản
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (05/05/2023)
+        [HttpPut("updateMultipleStatus")]
+        public ServiceResult UpdateMultipleStatus([FromBody] Guid[] ids, [FromQuery] int newStatus)
+        {
+            try
+            {
+                return _accountBL.UpdateMultipleStatus(ids, newStatus);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
     }
 }

@@ -29,23 +29,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
         }
    
         /// <summary>
-        /// Kiểm tra các trường dữ liệu của Employee
-        /// </summary>
-        /// <param name="employee"></param>
-        /// <returns></returns>
-        /// Author: NVDUC (4/4/2023)
-        public override List<string> ValidateRequestDataCustom(Employee employee)
-        {
-            // Mảng danh sách lỗi
-            var validateFailuresEmployee = new List<string>();
-            if (_employeeDL.CheckDuplicateCode(employee.EmployeeCode, employee.EmployeeId) == true)
-            {
-                validateFailuresEmployee.Add(Common.Resources.ContentMessage.DuplicateCode);
-            }
-            return validateFailuresEmployee;
-        }
-
-        /// <summary>
         /// Sinh ra mã nhân viên mới
         /// </summary>
         /// <returns>Mã nhân viên mới</returns>
@@ -79,16 +62,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
             return _employeeDL.GetPaging(search, pageNumber, pageSize);
         }
 
-        /// <summary>
-        /// Thực hiện chức năng xuất excel toàn bộ dữ liệu 
-        /// </summary>
-        /// <param name="employees"></param>
-        /// <returns>File excel chứa toàn bộ dữ liệu</returns>
-        /// Author: NVDUC (1/4/2023)
-        public Task<MemoryStream> ExportExcelEmployee(List<Employee> employees)
-        {
-            return _employeeDL.ExportExcelEmployee(employees);
-        }
         #endregion
     }
 }

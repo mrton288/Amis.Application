@@ -45,14 +45,6 @@ namespace Demo.WepApplication.DL.EmployeeDL
         public int DeleteMultiple(Guid[] listEmployeeId);
 
         /// <summary>
-        /// Thực hiện chức năng xuất excel toàn bộ dữ liệu 
-        /// </summary>
-        /// <param name="employees"></param>
-        /// <returns>File excel chứa toàn bộ dữ liệu</returns>
-        /// Author: NVDUC (1/4/2023)
-        public Task<MemoryStream> ExportExcelEmployee(List<Employee> employees);
-
-        /// <summary>
         /// Check trùng mã nhân viên
         /// </summary>
         /// <param name="employeeCode">Mã của bản ghi</param>

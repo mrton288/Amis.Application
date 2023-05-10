@@ -43,6 +43,14 @@ namespace Demo.WebApplication.BL.BaseBL
         /// Author: NVDUC (23/3/2023)
         public ServiceResult InsertRecord(T newRecord);
 
+
+        /// <summary>
+        /// Thực hiện thêm mới nhiều bản ghi
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        public ServiceResult InsertMultiple(IEnumerable<T> records);
+
         /// <summary>
         /// Xoá bản ghi theo Id
         /// </summary>

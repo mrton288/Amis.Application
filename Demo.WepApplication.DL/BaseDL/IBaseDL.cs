@@ -44,7 +44,14 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public T InsertRecord(T newRecord);
+        public int InsertRecord(T newRecord);
+
+        /// <summary>
+        /// Thực hiện thêm mới nhiều bản ghi
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        public int InsertMultiple(IEnumerable<T> recordList);
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -53,7 +60,6 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
         public T DeleteRecordById(Guid recordId);
-
 
         /// <summary>
         /// Thực hiện tìm kiếm phân trang danh sách bản ghi

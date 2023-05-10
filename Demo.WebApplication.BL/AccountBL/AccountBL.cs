@@ -165,6 +165,38 @@ namespace Demo.WebApplication.BL.AccountBL
             }
             return validateFailuresEmployee;
         }
+
+
+        /// <summary>
+        /// Cập nhật trạng thái nhiều tài khoản
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (05/05/2023)
+        public ServiceResult UpdateMultipleStatus(Guid[] ids, int newStatus)
+        {
+            var record = _accountDL.UpdateMultipleStatus(ids, newStatus);
+
+            if (record > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = true,
+                    UserMsg = Common.Resources.ContentMessage.S_Put,
+                    Data = record,
+                };
+            }
+            else
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    UserMsg = Common.Resources.ContentMessage.NotFound,
+                    ErrorCode = Common.Enums.ErrorCode.NotFound,
+                };
+            }
+        }
         #endregion
     }
 }

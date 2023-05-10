@@ -146,29 +146,6 @@ namespace Demo.WebApplication.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Gọi api xuất ra file excel các nhân viên hiện tại
-        /// </summary>
-        /// <param name="search">Từ khoá tìm kiếm</param>
-        /// <param name="pageNumber">Số trang hiện tại</param>
-        /// <param name="pageSize">Kích thước trang hiện tại</param>
-        /// <returns>File excel thông tin nhân viên</returns>
-        /// Author: NVDUC (29/3/2023)
-        [HttpGet("exportExcel")]
-        public async Task<IActionResult> ExportExcelEmployee()
-        {
-            List<Employee> employees = _employeeBL.GetAllRecord().ToList();
-            var stream = await _employeeBL.ExportExcelEmployee(employees);
-            try
-            {
-                string excelName = "Danh_sach_nhan_vien.xlsx";
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
         #endregion
     }
 }
