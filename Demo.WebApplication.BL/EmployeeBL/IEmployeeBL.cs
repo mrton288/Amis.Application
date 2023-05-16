@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Demo.WebApplication.BL.EmployeeBL
 {
-    public interface IEmployeeBL : IBaseBL<Employee>
+    public interface IPayDetailBL : IBaseBL<Employee>
     {
         #region Method 
 
@@ -34,14 +34,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
         int? pageNumber,
         int? pageSize
        );
-
-        /// <summary>
-        /// Xoá nhiều nhân viên theo danh sách Id
-        /// </summary>
-        /// <param name="listEmployeeId"></param>
-        /// <returns>Số lượng Id trong danh sách</returns>
-        /// Author: NVDUC (25/3/2023)
-        public int DeleteMultiple(Guid[] listEmployeeId);
 
         #endregion
     }

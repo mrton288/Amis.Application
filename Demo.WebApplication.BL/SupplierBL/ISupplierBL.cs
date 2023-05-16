@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demo.WebApplication.BL.SuppilerBL
+namespace Demo.WebApplication.BL.SupplierBL
 {
-    public interface ISuppilerBL : IBaseBL<Supplier>
+    public interface ISupplierBL : IBaseBL<Supplier>
     {
     }
 }

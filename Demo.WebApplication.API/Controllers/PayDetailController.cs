@@ -14,10 +14,15 @@ namespace Demo.WebApplication.API.Controllers
         #region Field
         private IPayDetailBL _paydetailBL;
         #endregion
+
+        #region Constructor
         public PayDetailController(IPayDetailBL paydetailBL) : base(paydetailBL)
         {
             _paydetailBL = paydetailBL;
         }
+        #endregion
+
+        #region Method
         /// <summary>
         /// Xoá một bản ghi theo Id
         /// </summary>
@@ -29,14 +34,7 @@ namespace Demo.WebApplication.API.Controllers
         {
             try
             {
-                var records = _paydetailBL.GetAllById(payId);
-                return new ServiceResult
-                {
-                    IsSuccess = true,
-                    Data = records,
-                    DevMsg = ContentMessage.S_Get,
-                    UserMsg = ContentMessage.S_Get,
-                };
+                return _paydetailBL.GetAllById(payId);
             }
             catch
             {
@@ -49,6 +47,32 @@ namespace Demo.WebApplication.API.Controllers
                 };
             }
         }
+
+        /// <summary>
+        /// Xoá nhiều bản ghi theo danh sách id truyền vào
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns>Số lượng Id xoá thành công</returns>
+        /// Author: NVDUC (25/3/2023)
+        [HttpDelete]
+        public ServiceResult DeleteMultiple([FromBody]Guid[] recordList)
+        {
+            try
+            {
+                return _paydetailBL.DeleteMultiple(recordList);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
+        #endregion
 
     }
 }

@@ -97,6 +97,15 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trùng số phiếu chi..
+        /// </summary>
+        public static string DuplicatePay {
+            get {
+                return ResourceManager.GetString("DuplicatePay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Xoá tài khoản không thành công..
         /// </summary>
         public static string E_DeleteAccount {
@@ -169,7 +178,7 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Xoá thành công.
+        ///   Looks up a localized string similar to Dữ liệu đã bị xoá..
         /// </summary>
         public static string S_Delete {
             get {
@@ -232,7 +241,7 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dữ liệu đã sửa..
+        ///   Looks up a localized string similar to Dữ liệu đã được sửa..
         /// </summary>
         public static string S_Put {
             get {

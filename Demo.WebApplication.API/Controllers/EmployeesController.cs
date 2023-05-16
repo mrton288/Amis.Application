@@ -25,12 +25,12 @@ namespace Demo.WebApplication.API.Controllers
     public class EmployeesController : BaseController<Employee>
     {
         #region Field
-        private IEmployeeBL _employeeBL;
+        private IPayDetailBL _employeeBL;
         #endregion
 
 
         #region Constructor
-        public EmployeesController(IEmployeeBL employeeBL) : base(employeeBL)
+        public EmployeesController(IPayDetailBL employeeBL) : base(employeeBL)
         {
             _employeeBL = employeeBL;
         }
@@ -49,51 +49,7 @@ namespace Demo.WebApplication.API.Controllers
         }
 
 
-        /// <summary>
-        /// Thực hiện xoá danh sách nhân viên theo danh sách id
-        /// </summary>
-        /// <param name="listEmployeeId"></param>
-        /// <returns>Danh sách bản ghi bị ảnh hưởng</returns>
-        /// Author: NVDUC (12/3/2023)
-        [HttpDelete]
-        public ServiceResult DeleteMultiple([FromBody] Guid[] listEmployeeId)
-        {
-            try
-            {
-                var result = _employeeBL.DeleteMultiple(listEmployeeId);
-                if (result > 0)
-                {
-                    return new ServiceResult
-                    {
-                        IsSuccess = true,
-                        DevMsg = ContentMessage.S_Delete,
-                        UserMsg = ContentMessage.S_DeleteEmployee,
-                        Data = listEmployeeId,
-                    };
-                }
-                else
-                {
-                    return new ServiceResult
-
-                    {
-                        IsSuccess = false,
-                        DevMsg = ContentMessage.NotFound,
-                        UserMsg = ContentMessage.NotFound,
-                        ErrorCode = ErrorCode.NotFound,
-                    };
-                }
-            }
-            catch
-            {
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    DevMsg = ContentMessage.Exception,
-                    UserMsg = ContentMessage.Exception,
-                    ErrorCode = ErrorCode.Exception,
-                };
-            }
-        }
+      
 
         /// <summary>
         /// Thực hiện phân trang và tìm kiếm theo mã, tên, số điện thoại bản ghi

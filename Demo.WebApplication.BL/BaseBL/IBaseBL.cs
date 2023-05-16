@@ -23,7 +23,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="recordId"></param>
         /// <returns>Thông tin của bản ghi đó</returns>
         /// Author: NVDUC (23/3/2023)
-        public T GetRecordById(Guid recordId);
+        public dynamic GetRecordById(Guid recordId);
 
         /// <summary>
         /// Cập nhật thông tin bản ghi theo Id
@@ -49,7 +49,16 @@ namespace Demo.WebApplication.BL.BaseBL
         /// </summary>
         /// <param name="records"></param>
         /// <returns></returns>
+        /// Author: NVDUC (09/05/2023)
         public ServiceResult InsertMultiple(IEnumerable<T> records);
+
+        /// <summary>
+        /// Thực hiện sửa nhiều bản ghi
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (15/05/2023)
+        public ServiceResult UpdateMultiple(IEnumerable<T> recordList);
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -67,7 +76,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public object GetPagingRecord(
+        public PagingResult<T> GetPagingRecord(
         string? search,
         int? pageNumber,
         int? pageSize

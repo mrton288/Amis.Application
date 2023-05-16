@@ -1,4 +1,5 @@
 ﻿using Demo.WebApplication.Common.Entities;
+using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WepApplication.DL.BaseDL;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,13 @@ namespace Demo.WepApplication.DL.PayDL
         /// Author: NVDUC (04/05/2023)
         public string GetNewVoucherCode();
 
-
         /// <summary>
         /// Thực hiện chức năng xuất excel theo điều kiện tìm kiếm
         /// </summary>
         /// <param name="pays"></param>
         /// <returns>File excel chứa dữ liệu theo điều kiện tìm kiếm</returns>
         /// Author: NVDUC (04/05/2023)
-        public Task<MemoryStream> ExportExcelPay(List<Pay> pays);
-
+        public Task<MemoryStream> ExportExcelPay(string? search);
 
         /// <summary>
         /// Thực hiện lấy ra danh sách theo keyword tìm kiếm
@@ -33,6 +32,34 @@ namespace Demo.WepApplication.DL.PayDL
         /// <param name="search"></param>
         /// <returns>Danh sách</returns>
         /// Author: NVDUC (29/04/2023)
-        public IEnumerable<Pay> GetAllByKey(string? search);
+        public IEnumerable<dynamic> GetAllByKey(string? search);
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        public int DeleteFullMultiple(Guid[]? ids);
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        public int DeleteMultiple(Guid id);
+
+        /// <summary>
+        /// Check trùng số phiếu chi
+        /// </summary>
+        /// <param name="voucherNumber">Số phiếu chi</param>
+        /// <param name="payId">Id pay</param>
+        /// <returns>Trả về true - trùng mã, false - không trùng</returns>
+        /// Author: NVDUC (29/4/2023)
+        public bool CheckDuplicateVoucherNumber(string voucherNumber, Guid payId);
+
     }
 }

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demo.WepApplication.DL.SuppilerDL
+namespace Demo.WepApplication.DL.SupplierDL
 {
-    public interface ISuppilerDL : IBaseDL<Supplier>
+    public interface ISupplierDL : IBaseDL<Supplier>
     {
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,17 +17,21 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Ngày hạch toán
         /// </summary>
+        [Required]
         public DateTime? ref_date { get; set; }
 
         /// <summary>
         /// Ngày chứng từ
         /// </summary>
+        [Required]
         public DateTime? voucher_date { get; set; }
 
         /// <summary>
         /// Số chứng từ
         /// </summary>
-        public string? voucher_number { get; set; }
+        [Required]
+        [MaxLength(20)]
+        public string voucher_number { get; set; }
 
         /// <summary>
         /// Diễn giải
@@ -34,19 +39,14 @@ namespace Demo.WebApplication.Common.Entities
         public string? description { get; set; }
 
         /// <summary>
-        /// Số tiền
+        /// Id đối tượng
         /// </summary>
-        public decimal? amount_money { get; set; }
+        public Guid? object_id { get; set; }
 
         /// <summary>
         /// Tên đối tượng
         /// </summary>
         public string? object_name { get; set; }
-
-        /// <summary>
-        /// Mã đối tượng
-        /// </summary>
-        public string? object_code { get; set; }
 
         /// <summary>
         /// Địa chỉ
@@ -59,9 +59,9 @@ namespace Demo.WebApplication.Common.Entities
         public string? receiver { get; set; }
 
         /// <summary>
-        /// Tên nhân viên
+        /// Id nhân viên
         /// </summary>
-        public string? employee_name { get; set; }
+        public Guid? employee_id { get; set; }
 
         /// <summary>
         /// Kèm theo (số lượng)

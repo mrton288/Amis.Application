@@ -4,6 +4,7 @@ using Demo.WebApplication.BL.DepartmentBL;
 using Demo.WebApplication.BL.EmployeeBL;
 using Demo.WebApplication.BL.PayBL;
 using Demo.WebApplication.BL.PayDetailBL;
+using Demo.WebApplication.BL.SupplierBL;
 using Demo.WepApplication.DL;
 using Demo.WepApplication.DL.AccountDL;
 using Demo.WepApplication.DL.BaseDL;
@@ -11,6 +12,7 @@ using Demo.WepApplication.DL.DepartmentDL;
 using Demo.WepApplication.DL.EmployeeDL;
 using Demo.WepApplication.DL.PayDetailDL;
 using Demo.WepApplication.DL.PayDL;
+using Demo.WepApplication.DL.SupplierDL;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,8 +36,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Dependency injection
-builder.Services.AddScoped<IEmployeeBL, EmployeeBL>();
-builder.Services.AddScoped<IEmployeeDL, EmployeeDL>();
+builder.Services.AddScoped<Demo.WebApplication.BL.EmployeeBL.IPayDetailBL, EmployeeBL>();
+builder.Services.AddScoped<Demo.WepApplication.DL.EmployeeDL.IPayDetailDL, EmployeeDL>();
 
 builder.Services.AddScoped<IDepartmentBL, DepartmentBL>();
 builder.Services.AddScoped<IDepartmentDL, DepartmentDL>();
@@ -46,8 +48,11 @@ builder.Services.AddScoped<IAccountDL, AccountDL>();
 builder.Services.AddScoped<IPayBL, PayBL>();
 builder.Services.AddScoped<IPayDL, PayDL>();
 
-builder.Services.AddScoped<IPayDetailBL, PayDetailBL>();
-builder.Services.AddScoped<IPayDetailDL, PayDetailDL>();
+builder.Services.AddScoped<Demo.WebApplication.BL.PayDetailBL.IPayDetailBL, PayDetailBL>();
+builder.Services.AddScoped<Demo.WepApplication.DL.PayDetailDL.IPayDetailDL, PayDetailDL>();
+
+builder.Services.AddScoped<ISupplierBL, SupplierBL>();
+builder.Services.AddScoped<ISupplierDL, SupplierDL>();
 
 builder.Services.AddScoped(typeof(IBaseBL<>), typeof(BaseBL<>));
 builder.Services.AddScoped(typeof(IBaseDL<>), typeof(BaseDL<>));

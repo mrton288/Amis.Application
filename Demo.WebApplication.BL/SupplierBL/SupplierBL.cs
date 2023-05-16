@@ -1,25 +1,25 @@
 ﻿using Demo.WebApplication.BL.BaseBL;
 using Demo.WebApplication.Common.Entities;
-using Demo.WepApplication.DL.SuppilerDL;
+using Demo.WepApplication.DL.SupplierDL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demo.WebApplication.BL.SuppilerBL
+namespace Demo.WebApplication.BL.SupplierBL
 {
-    public class SuppilerBL : BaseBL<Supplier>, ISuppilerBL
+    public class SupplierBL : BaseBL<Supplier>, ISupplierBL
     {
         #region Field
-        private readonly ISuppilerDL _supplierDL;
+        private readonly ISupplierDL _supplierDL;
         #endregion
 
         #region Constructor
-        public SuppilerBL(ISuppilerDL suppilerDL) : base(suppilerDL)
+        public SupplierBL(ISupplierDL supplierDL) : base(supplierDL)
         {
-            _supplierDL = suppilerDL;
-        } 
+            _supplierDL = supplierDL;
+        }
         #endregion
     }
 }

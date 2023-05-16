@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
-using Demo.WepApplication.DL.EmployeeDL;
 using MySqlConnector;
 using Npgsql;
 using System;
@@ -9,9 +8,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Npgsql.PostgresTypes.PostgresCompositeType;
 using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
 
 namespace Demo.WepApplication.DL.BaseDL
@@ -26,20 +29,25 @@ namespace Demo.WepApplication.DL.BaseDL
         /// Author: NVDUC (23/3/2023)
         public IEnumerable<T> GetAllRecord()
         {
-            // Chuẩn bị tên stored
-            string storedFunctionName = $"Func_{typeof(T).Name}_getall()";
+            try
+            {
+                string queryString = $"select * from {typeof(T).Name}";
 
-            string queryString = $"select * from {storedFunctionName}";
+                // Khởi tạo kết nối với DB
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
 
-            // Khởi tạo kết nối với DB
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
+                // Thực hiện câu lệnh sql
+                var records = postgreSQL.Query<T>(queryString, commandType: System.Data.CommandType.Text);
 
-            // Thực hiện câu lệnh sql
-            var records = postgreSQL.Query<T>(queryString, commandType: System.Data.CommandType.Text);
-
-            postgreSQL.Close();
-            return records.ToList();
+                postgreSQL.Close();
+                return records.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
         }
 
         /// <summary>
@@ -48,24 +56,37 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="recordId"></param>
         /// <returns>Thông tin của bản ghi đó</returns>
         /// Author: NVDUC (23/3/2023)
-        public T GetRecordById(Guid recordId)
+        public dynamic GetRecordById(Guid recordId)
         {
-            // Chuẩn bị tên stored
-            string queryString = $"select * from func_{typeof(T).Name}_get_by_id(@id_{typeof(T).Name}_select)";
+            try
+            {
+                // Chuẩn bị tên stored
+                string idField = $"{typeof(T).Name}_id";
+                string joinOption = "";
+                string selectQuery = "*";
+                if (typeof(T).Name == "Pay")
+                {
+                    idField = "pay_id";
+                    joinOption = "left join supplier on object_id = supplier_id left join employee on employee.employee_id = pay.employee_id";
+                    selectQuery = "pay.pay_id, pay.ref_date, pay.voucher_date, pay.voucher_number, pay.description, pay.quantity, employee.employee_id, employee.full_name, pay.object_id , supplier.supplier_code, COALESCE(pay.object_name, supplier.supplier_name) AS object_name, COALESCE(pay.address, supplier.address) AS address, COALESCE(pay.receiver, supplier.supplier_name) AS receiver";
+                }
+                string queryString = $"Select {selectQuery} from {typeof(T).Name} {joinOption} where {idField} = '{recordId}'";
 
-            // Chuẩn bị tham số đầu vào
-            var parameters = new DynamicParameters();
-            parameters.Add($"@id_{typeof(T).Name}_select", recordId);
+                // Khởi tạo kết nối tới database
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
 
-            // Khởi tạo kết nối tới database
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
+                // Thực hiện câu lệnh sql
+                var record = postgreSQL.QueryFirstOrDefault<dynamic>(queryString, commandType: System.Data.CommandType.Text);
 
-            // Thực hiện câu lệnh sql
-            var record = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
-
-            postgreSQL.Close();
-            return record;
+                postgreSQL.Close();
+                return record;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
         }
 
         /// <summary>
@@ -74,177 +95,205 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord">entity</param>
         /// <returns>Id của bản ghi được thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord)
+        public InsertResult InsertRecord(T newRecord)
         {
-            //// Chuẩn bị tên stored
-            //string functionName = $"func_{typeof(T).Name}_add"; ;
-
-            //// Build query string 
-            //var stringParam = new StringBuilder("");
-            //Guid newRecordId = Guid.NewGuid();
-
-            //var properties = typeof(T).GetProperties();
-
-            //foreach (var property in properties)
-            //{
-            //    var propName = property.Name;
-            //    var propValue = property.GetValue(newRecord);
-
-            //    if (propName == $"{typeof(T).Name}_id".ToLower())
-            //    {
-            //        stringParam.Append($"'{newRecordId}'");
-            //    }
-
-            //    else if (property.PropertyType == typeof(Guid?) && propValue is null or (object)"")
-            //    {
-            //        stringParam.Append(",null");
-            //    }
-            //    else if (propName == "modified_date" || propName == "created_date")
-            //    {
-            //        stringParam.Append($",'{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")}'");
-            //    }
-            //    else
-            //    {
-            //        if (property.PropertyType == typeof(int?) || property.PropertyType == typeof(decimal?))
-            //        {
-            //            stringParam.Append($",{propValue}");
-            //        }
-            //        else
-            //        {
-            //            stringParam.Append($",'{propValue}'");
-            //        }
-            //    }
-            //}
-
-            //string stringQuery = $"select * from {functionName}({stringParam})";
-
-            //// Khởi tạo kết nối với DB
-            //using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            //postgreSQL.Open();
-            //// Thực hiện câu lệnh sql
-            //var record = postgreSQL.QueryFirstOrDefault<T>(stringQuery, commandType: System.Data.CommandType.Text);
-
-            //postgreSQL.Close();
-
-            //return record;
-
-
-
-            //string queryString = $"insert into {typeof(T).Name}";
-            //string columns = "(";
-            //string colValue = "(";
-            //var properties = typeof(T).GetProperties();
-            //int i = 0;
-            //foreach (var property in properties)
-            //{
-            //    if (i != properties.Length - 1)
-            //    {
-            //        columns += property.Name + ',';
-            //        if (i == 0)
-            //        {
-            //            string newId = Guid.NewGuid().ToString();
-            //            colValue += $"'{newId}',";
-            //        }
-            //        else
-            //        {
-            //            if (property.GetValue(newRecord) == null)
-            //            {
-            //                colValue += "null" + ',';
-            //            }
-            //            else
-            //            {
-            //                if (property.PropertyType.Name.CompareTo("Int32") != 0)
-            //                    colValue += $"'{property.GetValue(newRecord).ToString()}'" + ',';
-            //                else
-            //                    colValue += property.GetValue(newRecord).ToString() + ',';
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        columns += property.Name + ')';
-            //        if (property.GetValue(newRecord) == null)
-            //        {
-            //            colValue += "null" + ')';
-            //        }
-            //        else
-            //        {
-            //            if (property.PropertyType.Name.CompareTo("Int32") != 0)
-            //                colValue += $"'{property.GetValue(newRecord).ToString()}'" + ')';
-            //            else
-            //                colValue += property.GetValue(newRecord).ToString() + ')';
-            //        }
-            //    }
-            //    i++;
-            //}
-
-            //queryString += columns + " values " + colValue + ';';
-            string tableName = typeof(T).Name;
-            string columns = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
-            string values = string.Join(", ", typeof(T).GetProperties().Select(p =>
+            Guid id = Guid.NewGuid();
+            try
             {
-                if (p.Name == $"{tableName}_id".ToLower())
+                string tableName = typeof(T).Name;
+                string columns = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
+                string values = string.Join(", ", typeof(T).GetProperties().Select(p =>
                 {
-                    return $"'{Guid.NewGuid()}'";
-                }
-                else if (p.GetValue(newRecord) == null)
+                    if (p.Name == $"{tableName}_id".ToLower())
+                    {
+                        return $"'{id}'";
+                    }
+                    else if (p.Name == "created_date")
+                    {
+                        return $"'{(string)DateTime.Now.ToString("yyyy-MM-dd")}'";
+                    }
+                    else if (p.PropertyType == typeof(DateTime?))
+                    {
+                        var dateValue = (DateTime?)p.GetValue(newRecord);
+                        if (dateValue.HasValue)
+                        {
+                            return $"'{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
+                        }
+                        else
+                        {
+                            return "null";
+                        }
+                    }
+                    else if (p.GetValue(newRecord) == null)
+                    {
+                        return "null";
+                    }
+                    else
+                    {
+                        return $"'{p.GetValue(newRecord)}'";
+                    }
+                }));
+                string queryString = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
+                // Thực hiện câu lệnh sql
+                var rowEffected = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
+                return new InsertResult
                 {
-                    return "null";
-                }
-                else
-                {
-                    return $"'{p.GetValue(newRecord)}'";
-                }
-
-            }));
-
-            string queryString = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-            // Thực hiện câu lệnh sql
-            var result = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
-            return result;
+                    IdInsert = id,
+                    NumberEffect = rowEffected,
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
         }
-
 
         /// <summary>
         /// Thực hiện thêm mới nhiều bản ghi
         /// </summary>
         /// <param name="recordList"></param>
         /// <returns></returns>
+        /// Author: NVDUC (09/05/2023)
         public int InsertMultiple(IEnumerable<T> recordList)
         {
-            string tableName = typeof(T).Name.ToLower();
-            string columns = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
-            string values = string.Join(", ", recordList.Select(record =>
+            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
             {
-                return "(" + string.Join(", ", typeof(T).GetProperties().Select(p =>
+                postgreSQL.Open();
+                using (NpgsqlTransaction transaction = postgreSQL.BeginTransaction())
                 {
-                    if (p.Name == $"{tableName}_id".ToLower())
+                    try
                     {
-                        return $"'{Guid.NewGuid()}'";
-                    }
-                    else
-                    {
-                        object val = p.GetValue(record);
-                        if (val == null)
+                        string tableName = typeof(T).Name.ToLower();
+                        string columns = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
+                        string values = string.Join(", ", recordList.Select(record =>
                         {
-                            return "null";
-                        }
-                        else
-                        {
-                            return $"'{val.ToString()}'";
-                        }
-                    }
-                })) + ")";
-            }));
+                            return "(" + string.Join(", ", typeof(T).GetProperties().Select(p =>
+                            {
+                                if (p.Name == $"{tableName}_id".ToLower())
+                                {
+                                    return $"'{Guid.NewGuid()}'";
+                                }
+                                else
+                                {
+                                    object val = p.GetValue(record);
+                                    if (val == null)
+                                    {
+                                        return "null";
+                                    }
+                                    else if (p.Name == "created_date")
+                                    {
+                                        return $"'{(string)DateTime.Now.ToString("yyyy-MM-dd")}'";
+                                    }
+                                    else if (p.PropertyType == typeof(DateTime?))
+                                    {
+                                        var dateValue = (DateTime?)val;
+                                        if (dateValue.HasValue)
+                                        {
+                                            return $"'{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
+                                        }
+                                        else
+                                        {
+                                            return "null";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return $"'{val.ToString()}'";
+                                    }
+                                }
+                            })) + ")";
+                        }));
 
-            string queryString = $"INSERT INTO {tableName} ({columns}) VALUES {values}";
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-            // Thực hiện câu lệnh sql
-            var result = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
-            return result;
+                        string queryString = $"INSERT INTO {tableName} ({columns}) VALUES {values}";
+                        // Thực hiện câu lệnh sql
+                        int rowEffected = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
+                        transaction.Commit();
+                        postgreSQL.Close();
+                        return rowEffected;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Thực hiện sửa nhiều bản ghi
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (15/05/2023)
+        public int UpdateMultiple(IEnumerable<T> recordList)
+        {
+            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
+            {
+                postgreSQL.Open();
+                using (NpgsqlTransaction transaction = postgreSQL.BeginTransaction())
+                {
+                    try
+                    {
+                        string tableName = typeof(T).Name.ToLower();
+                        string idColumn = $"{tableName}_id".ToLower();
+                        string columns = string.Join(", ", typeof(T).GetProperties().Where(p => p.Name != idColumn).Select(p => $"\"{p.Name}\""));
+
+                        int rowEffected = 0;
+
+                        foreach (var record in recordList)
+                        {
+                            string values = string.Join(", ", typeof(T).GetProperties().Where(p => p.Name != idColumn).Select(p =>
+                            {
+                                object val = p.GetValue(record);
+                                if (val == null)
+                                {
+                                    return "null";
+                                }
+                                else if (p.PropertyType == typeof(DateTime?))
+                                {
+                                    var dateValue = (DateTime?)val;
+                                    if (dateValue.HasValue)
+                                    {
+                                        return $"'{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
+                                    }
+                                    else
+                                    {
+                                        return "null";
+                                    }
+                                }
+                                else
+                                {
+                                    return $"'{val.ToString().Replace("'", "''")}'";
+                                }
+                            }));
+
+                            object idValue = record.GetType().GetProperty(idColumn).GetValue(record);
+                            string updateQuery = $"UPDATE \"{tableName}\" SET ({columns}) = ({values}) WHERE \"{idColumn}\" = '{idValue.ToString()}'";
+
+                            using (var command = new NpgsqlCommand(updateQuery, postgreSQL))
+                            {
+                                command.CommandType = System.Data.CommandType.Text;
+                                rowEffected += command.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                        postgreSQL.Close();
+                        return rowEffected;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -254,58 +303,56 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trả về số bản ghi bị ảnh hưởng</returns>
         /// Author: NVDUC (23/3/2023)
-        public T UpdateRecordById(Guid recordId, T newRecord)
+        public int UpdateRecordById(Guid recordId, T newRecord)
         {
-            // Chuẩn bị tên stored
-            string functionName = $"func_{typeof(T).Name}_update_by_id";
-
-            // Build query string 
-            var stringParam = new StringBuilder("");
-
-            var properties = typeof(T).GetProperties();
-
-            foreach (var property in properties)
+            try
             {
-                var propName = property.Name;
-                var propValue = property.GetValue(newRecord);
-
-                if (propName == $"{typeof(T).Name}_id".ToLower())
+                string tableName = typeof(T).Name;
+                string setValues = string.Join(", ", typeof(T).GetProperties().Select(p =>
                 {
-                    stringParam.Append($"'{recordId}'");
-                }
-
-                else if (property.PropertyType == typeof(Guid?) && propValue is null or (object)"")
-                {
-                    stringParam.Append(",null");
-                }
-                else if (propName == "modified_date" || propName == "created_date")
-                {
-                    stringParam.Append($",'{DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")}'");
-                }
-                else
-                {
-                    if (property.PropertyType == typeof(int?) || property.PropertyType == typeof(decimal?))
+                    if (p.Name == $"{tableName}_id".ToLower())
                     {
-                        stringParam.Append($",{propValue}");
+                        return $"{p.Name} = '{recordId}'";
+                    }
+                    else if (p.Name == "modified_date")
+                    {
+                        return $"{p.Name} = '{(string)DateTime.Now.ToString("yyyy-MM-dd")}'";
+                    }
+                    else if (p.PropertyType == typeof(DateTime?))
+                    {
+                        var dateValue = (DateTime?)p.GetValue(newRecord);
+                        if (dateValue.HasValue)
+                        {
+                            return $"{p.Name} = '{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
+                        }
+                        else
+                        {
+                            return $"{p.Name} = null";
+                        }
+                    }
+                    else if (p.GetValue(newRecord) == null)
+                    {
+                        return $"{p.Name} = null";
                     }
                     else
                     {
-                        stringParam.Append($",'{propValue}'");
+                        return $"{p.Name} = '{p.GetValue(newRecord)}'";
                     }
-                }
+
+                })); // Lọc bỏ các giá trị null
+                string queryString = $"UPDATE {tableName} SET {setValues} WHERE {tableName}_id = '{recordId}'";
+
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
+                // Thực hiện câu lệnh sql
+                int rowEffected = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
+                return rowEffected;
             }
-
-            string stringQuery = $"select * from {functionName}({stringParam})";
-
-            // Khởi tạo kết nối với DB
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-            // Thực hiện câu lệnh sql
-            var record = postgreSQL.QueryFirstOrDefault<T>(stringQuery, commandType: System.Data.CommandType.Text);
-
-            postgreSQL.Close();
-
-            return record;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return -1;
+            }
         }
 
         /// <summary>
@@ -314,22 +361,26 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="recordId"></param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public T DeleteRecordById(Guid recordId)
+        public int DeleteRecordById(Guid recordId)
         {
-            //Chuẩn bị tên stored
-            string queryString = $"SELECT * FROM func_{typeof(T).Name}_delete_by_id(@id_{typeof(T).Name}_select)";
+            try
+            {
+                // Chuẩn bị query string
+                string queryString = $"Delete from {typeof(T).Name} where {typeof(T).Name}.{typeof(T).Name}_id = '{recordId}'";
+                // Kết nối tới db
+                using var postgresql = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgresql.Open();
+                // Thực hiện query
+                int rowEffected = postgresql.Execute(queryString, commandType: System.Data.CommandType.Text);
 
-            // Chuẩn bị tham số đầu vào
-            var parameters = new DynamicParameters();
-            parameters.Add($"@id_{typeof(T).Name}_select", recordId);
-
-            // Khởi tạo kết nối với DB
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-
-            var result = postgreSQL.QueryFirstOrDefault<T>(queryString, parameters, commandType: System.Data.CommandType.Text);
-            postgreSQL.Close();
-            return result;
+                postgresql.Close();
+                return rowEffected;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return -1;
+            }
         }
 
         /// <summary>
@@ -340,60 +391,74 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public object GetPagingRecord(string? search, int? pageNumber, int? pageSize)
+        public PagingResult<T> GetPagingRecord(string? search, int? pageNumber, int? pageSize)
         {
-            //Chuẩn bị tên stored
-            string storedFunctionName = $"func_{typeof(T).Name}_getpaging";
-
+            int? offset = (pageSize * pageNumber) - pageSize;
             search ??= "";
-
-            string queryString = $"select * from {storedFunctionName}('{search}', {pageNumber}, {pageSize})";
-
-            // Khởi tạo kết nối với DB
+            dynamic queryCustom = BuildQueryCustom();
+            string queryString = $"select {queryCustom.selectOption} from {typeof(T).Name} {queryCustom.joinOption} {queryCustom.search} order by {queryCustom.orderBy} desc limit {pageSize} offset {offset};";
+            string getTotalRecord = $"select count(*) from {typeof(T).Name} {queryCustom.search};";
+            string? getTotalAmount = null;
+            if (typeof(T).Name == "Pay")
+            {
+                getTotalAmount = "select sum(paydetail.amount_money) from paydetail inner join pay on paydetail.pay_id = pay.pay_id where pay.description ilike ('%' || @search  || '%') "
+                    + "or cast(pay.ref_date as text) ilike ('%' || @search  || '%') " + "or cast(pay.ref_date as text) ilike ('%' || @search  || '%') " + "or pay.voucher_number ilike ('%' || @search  || '%') " + "or pay.description ilike ('%' || @search  || '%');";
+                getTotalRecord = $"select count(*) from {typeof(T).Name} " + queryCustom.joinOption + " " + queryCustom.search + ";";
+            }
             using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
-
             {
                 postgreSQL.Open();
+                // Thực hiện truy vấn
+                string excuteQuery = queryString + getTotalRecord + getTotalAmount;
+                var resultSets = postgreSQL.QueryMultiple(excuteQuery, new { search, limit = pageSize, offset = offset }, commandType: CommandType.Text);
+                // Kiểm tra kết quả trả về
+                var data = resultSets.Read();
+                var totalRecord = resultSets.Read();
+                var totalAmount = getTotalAmount != null ? resultSets.Read() : null;
 
-                // Thưc hiện câu lệnh sql
-                var records = postgreSQL.Query(queryString, commandType: System.Data.CommandType.Text);
-
+                var result = new PagingResult<T>
+                {
+                    ListRecord = data,
+                    TotalRecord = totalRecord,
+                    OptionResult = totalAmount,
+                };
                 postgreSQL.Close();
-                return records;
+                return result;
             }
-
-            //int? offset = (pageSize * pageNumber) - pageSize;
-            //search ??= "";
-            //string selectOption = "*";
-            //string joinOption = "";
-            //string? optionalQuery = null;
-            //string queryString = $"select {selectOption} from {typeof(T).Name} {joinOption} order by {typeof(T).Name}.created_date desc limit {pageSize} offset {offset};";
-            //string getTotalRecord = $"select count(*) from {typeof(T).Name};";
-            //using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
-            //{
-            //    postgreSQL.Open();
-            //    // Thực hiện truy vấn
-            //    string excuteQuery = queryString + getTotalRecord;
-            //    if (optionalQuery != null)
-            //    {
-            //        excuteQuery += optionalQuery;
-            //    }
-            //    var resultSets = postgreSQL.QueryMultiple(excuteQuery, commandType: CommandType.Text);
-            //    // Kiểm tra kết quả trả về
-            //    var data = resultSets.Read();
-            //    var totalRecord = resultSets.Read();
-            //    //var optionResult = optionalQuery != null ? resultSets.Read() : null;
-
-            //    var result = new PagingResult<T>
-            //    {
-            //        ListRecord = data,
-            //        TotalRecord = totalRecord,
-            //    };
-            //    postgreSQL.Close();
-            //    return result;
-            //}
         }
-     
+
+        /// <summary>
+        /// Hàm tạo câu lệnh sql chung
+        /// </summary>
+        /// <returns>Đối tượng chứa các thành phần câu lệnh sql</returns>
+        /// Author: NVDUC (12/05/2023)
+        public virtual object BuildQueryCustom()
+        {
+            string whereClause = "";
+            PropertyInfo[] properties = typeof(T).GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    if (string.IsNullOrEmpty(whereClause))
+                    {
+                        whereClause += "where ";
+                    }
+                    else
+                    {
+                        whereClause += " or ";
+                    }
+                    whereClause += $"{typeof(T).Name}.{property.Name} ilike '%' || @search || '%'";
+                }
+            }
+            return new
+            {
+                selectOption = "*",
+                joinOption = "",
+                orderBy = $"{typeof(T).Name}.created_date",
+                search = whereClause,
+            };
+        }
         #endregion
     }
 }

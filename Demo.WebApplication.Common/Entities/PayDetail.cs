@@ -11,7 +11,7 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Id chi tiền chi tiết
         /// </summary>
-        public Guid pay_detail_id { get; set; }
+        public Guid paydetail_id { get; set; }
 
         /// <summary>
         /// Id chi tiền
@@ -39,7 +39,12 @@ namespace Demo.WebApplication.Common.Entities
         public decimal? amount_money { get; set; }
 
         /// <summary>
-        /// Mã đối tượng
+        /// Id đối tượng
+        /// </summary>
+        public Guid? object_id { get; set; }
+
+        /// <summary>
+        /// Tên đối tượng
         /// </summary>
         public string? object_code { get; set; }
 
@@ -66,6 +71,6 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Người chỉnh sửa
         /// </summary>
-        public string? modified_by { get; set; }
+        public string? modified_by { get; set; } 
     }
 }

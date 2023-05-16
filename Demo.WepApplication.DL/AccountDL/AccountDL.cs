@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using Demo.WebApplication.Common.Entities;
+using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WepApplication.DL.BaseDL;
 using Demo.WepApplication.DL.EmployeeDL;
 using MySqlConnector;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,17 +23,28 @@ namespace Demo.WepApplication.DL.AccountDL
         /// <param name="search"></param>
         /// <returns>Danh sách tài khoản</returns>
         /// Author: NVDUC (29/04/2023)
-        public IEnumerable<Account> GetAllByKey(string? search)
+        public PagingResult<Account> GetAllByKey(string? search)
         {
             search ??= "";
-            string queryString = $"select * from func_account_getall_by_key('{search}')";
+            string querySearch = "where account.account_number ilike ('%' || @search || '%') or account.account_name ilike ('%' || @search || '%')";
+            string queryString = $"select * from account {querySearch} order by account.account_number asc;";
+            string getTotalRecord = $"select count(*) from account {querySearch};";
+            string excuteQuery = queryString + getTotalRecord;
 
             using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
             postgreSQL.Open();
+            var resultSets = postgreSQL.QueryMultiple(excuteQuery,new { search }, commandType: CommandType.Text);
+            // Kiểm tra kết quả trả về
+            var data = resultSets.Read();
+            var totalRecord = resultSets.Read();
 
-            var record = postgreSQL.Query<Account>(queryString, commandType: System.Data.CommandType.Text);
+            var result = new PagingResult<Account>
+            {
+                ListRecord = data,
+                TotalRecord = totalRecord,
+            };
             postgreSQL.Close();
-            return record.ToList();
+            return result;
         }
 
         /// <summary>

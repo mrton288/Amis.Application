@@ -77,9 +77,91 @@ namespace Demo.WebApplication.BL.PayBL
         /// <param name="pays"></param>
         /// <returns>File excel chứa dữ liệu theo điều kiện tìm kiếm</returns>
         /// Author: NVDUC (04/05/2023)
-        public Task<MemoryStream> ExportExcelPay(List<Pay> pays)
+        public Task<MemoryStream> ExportExcelPay(string? search)
         {
-            return _payDL.ExportExcelPay(pays);
+            return _payDL.ExportExcelPay(search);
         }
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        public ServiceResult DeleteFullMultiple(Guid[]? ids)
+        {
+            var result = _payDL.DeleteFullMultiple(ids);
+            if (result > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = true,
+                    DevMsg = ContentMessage.S_Delete,
+                    UserMsg = ContentMessage.S_Delete,
+                    Data = result,
+                };
+            }
+            else
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.NotFound,
+                    UserMsg = ContentMessage.NotFound,
+                    ErrorCode = ErrorCode.NotFound,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        public ServiceResult DeleteMultiple(Guid id)
+        {
+            var result = _payDL.DeleteMultiple(id);
+            if (result > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = true,
+                    DevMsg = ContentMessage.S_Delete,
+                    UserMsg = ContentMessage.S_Delete,
+                    Data = result,
+                };
+            }
+            else
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.NotFound,
+                    UserMsg = ContentMessage.NotFound,
+                    ErrorCode = ErrorCode.NotFound,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Kiểm tra các trường dữ liệu của Pay
+        /// </summary>
+        /// <param name="pay"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (24/4/2023)
+        public override List<string> ValidateRequestDataCustom(Pay pay)
+        {
+            // Mảng danh sách lỗi
+            var validateFailuresPay = new List<string>();
+            if (_payDL.CheckDuplicateVoucherNumber(pay.voucher_number, pay.pay_id) == true)
+            {
+                validateFailuresPay.Add($"Số phiếu chi <{pay.voucher_number}> đã tồn tại trong hệ thống, vui lòng kiểm tra lại.");
+            }
+            return validateFailuresPay;
+        }
+
     }
 }

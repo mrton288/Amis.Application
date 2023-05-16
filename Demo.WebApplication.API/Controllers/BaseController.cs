@@ -128,7 +128,7 @@ namespace Demo.WebApplication.API.Controllers
         /// <returns></returns>
         /// Author: NVDUC (13/3/2023)
         [HttpPut("{recordId}")]
-        public ServiceResult UpdateRecordById(Guid recordId, T newRecord)
+        public ServiceResult UpdateRecordById(Guid recordId,[FromBody] T newRecord)
         {
             try
             {
@@ -199,6 +199,32 @@ namespace Demo.WebApplication.API.Controllers
         }
 
         /// <summary>
+        /// Api thêm một bản ghi mới
+        /// </summary>
+        /// <param name="newRecord"></param>
+        /// <returns>Trả về trạng thái thêm mới</returns>
+        /// Created By: NVDUC (13/3/2023)
+        [HttpPut("updateMultiple")]
+        public ServiceResult UpdateMultiple([FromBody] IEnumerable<T> recordList)
+        {
+            try
+            {
+                //TODO: Hàm insert 
+                return _baseBL.UpdateMultiple(recordList);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
+
+        /// <summary>
         /// Xoá một bản ghi theo Id
         /// </summary>
         /// <param name="recordId"></param>
@@ -223,7 +249,14 @@ namespace Demo.WebApplication.API.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Thực hiện tìm kiếm phân trang danh sách bản ghi
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Các bản ghi trùng với điều kiện</returns>
+        /// Author: NVDUC (23/3/2023)
         [HttpGet("pagingRecord")]
         public ServiceResult GetPagingRecord([FromQuery]string? search,
         [FromQuery] int? pageNumber = 1,

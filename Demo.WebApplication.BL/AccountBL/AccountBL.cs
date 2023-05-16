@@ -59,8 +59,6 @@ namespace Demo.WebApplication.BL.AccountBL
             }
         }
 
-
-
         /// <summary>
         /// Thực hiện cập nhật trạng thái của tài khoản
         /// </summary>
@@ -158,14 +156,13 @@ namespace Demo.WebApplication.BL.AccountBL
         public override List<string> ValidateRequestDataCustom(Account account)
         {
             // Mảng danh sách lỗi
-            var validateFailuresEmployee = new List<string>();
+            var validateFailureAccount = new List<string>();
             if (_accountDL.CheckDuplicateAccount(account.account_number, account.account_id) == true)
             {
-                validateFailuresEmployee.Add(Common.Resources.ContentMessage.DuplicateAccount);
+                validateFailureAccount.Add(Common.Resources.ContentMessage.DuplicateAccount);
             }
-            return validateFailuresEmployee;
+            return validateFailureAccount;
         }
-
 
         /// <summary>
         /// Cập nhật trạng thái nhiều tài khoản

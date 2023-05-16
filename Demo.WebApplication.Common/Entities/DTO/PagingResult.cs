@@ -15,8 +15,8 @@
         public dynamic? TotalRecord { get; set; }
 
         /// <summary>
-        /// Tổng số tiên
+        /// Giá trị tuỳ chọn trả về
         /// </summary>
-        public decimal? TotalAmount { get; set; }
+        public object? OptionResult { get; set; }
     }
 }

@@ -23,7 +23,7 @@ using System.Transactions;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
-    public class EmployeeDL : BaseDL<Employee>, IEmployeeDL
+    public class EmployeeDL : BaseDL<Employee>, IPayDetailDL
     {
 
         #region Method
@@ -131,44 +131,6 @@ namespace Demo.WepApplication.DL.EmployeeDL
         }
 
         /// <summary>
-        /// Xoá nhiều nhân viên theo danh sách Id
-        /// </summary>
-        /// <param name="listEmployeeId"></param>
-        /// <returns>Số lượng Id trong danh sách</returns>
-        /// Author: NVDUC (25/3/2023)
-        public int DeleteMultiple(Guid[] listEmployeeId)
-        {
-            using (var mySqlConnection = new MySqlConnection(DatabaseContext.ConnectionString))
-            {
-                // Khởi tạo kết nối với DB
-                mySqlConnection.Open();
-                using (MySqlTransaction transaction = mySqlConnection.BeginTransaction())
-                {
-                    try
-                    {
-                        // Chuẩn bị store
-                        string deleteMultiple = "DELETE FROM employee WHERE EmployeeId IN @listEmployeeId";
-                        // Chuẩn bị các tham số đầu vào
-                        var parameters = new DynamicParameters();
-                        parameters.Add("@listEmployeeId", listEmployeeId);
-
-                        int numberRecord = mySqlConnection.Execute(deleteMultiple, parameters, transaction, commandType: System.Data.CommandType.Text);
-
-                        transaction.Commit();
-                        mySqlConnection.Close();
-                        return numberRecord;
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-
-            }
-        }
-
-        /// <summary>
         /// Kiểm tra trùng mã nhân viên
         /// </summary>
         /// <param name="employeeCode">Mã nhân viên</param>
@@ -195,6 +157,26 @@ namespace Demo.WepApplication.DL.EmployeeDL
                 }
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Thực hiện tạo ra câu query cho Employee
+        /// </summary>
+        /// <returns></returns>
+        /// Author: NVDUC (29/04/2023)
+        public override object BuildQueryCustom()
+        {
+            string whereClause = "where employee.employee_code ilike ('%' || @search  || '%') " +
+                "or employee.full_name ilike ('%' || @search  || '%') " +
+                "or employee.position_name ilike ('%' || @search  || '%') " +
+                "or employee.phone_number ilike ('%' || @search  || '%') ";
+            return new
+            {
+                selectOption = "*",
+                joinOption = "",
+                orderBy = "employee.employee_code",
+                search = whereClause,
+            };
         }
     }
     #endregion

@@ -16,14 +16,14 @@ using static Dapper.SqlMapper;
 
 namespace Demo.WebApplication.BL.EmployeeBL
 {
-    public class EmployeeBL : BaseBL<Employee>, IEmployeeBL
+    public class EmployeeBL : BaseBL<Employee>, IPayDetailBL
     {
         #region Field
-        private IEmployeeDL _employeeDL;
+        private IPayDetailDL _employeeDL;
         #endregion
 
         #region Method
-        public EmployeeBL(IEmployeeDL employeeDL) : base(employeeDL)
+        public EmployeeBL(IPayDetailDL employeeDL) : base(employeeDL)
         {
             _employeeDL = employeeDL;
         }
@@ -36,17 +36,6 @@ namespace Demo.WebApplication.BL.EmployeeBL
         public string GetNewCode()
         {
             return _employeeDL.GetNewCode();
-        }
-
-        /// <summary>
-        /// Xoá nhiều nhân viên theo danh sách Id
-        /// </summary>
-        /// <param name="listEmployeeId"></param>
-        /// <returns>Số lượng Id trong danh sách</returns>
-        /// Author: NVDUC (25/3/2023)
-        public int DeleteMultiple(Guid[] listEmployeeId)
-        {
-            return _employeeDL.DeleteMultiple(listEmployeeId);
         }
 
         /// <summary>

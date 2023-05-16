@@ -1,4 +1,5 @@
 ﻿using Demo.WebApplication.Common.Entities;
+using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WepApplication.DL.BaseDL;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,15 @@ namespace Demo.WepApplication.DL.PayDetailDL
         /// <param name="payId">Id của bản ghi chi tiền cha</param>
         /// <returns>Danh sách chi tiền chi tiết</returns>
         /// Author: NVDUC (25/04/2023)
-        public IEnumerable<PayDetail> GetAllById(Guid payId);
+        public PagingResult<PayDetail> GetAllById(Guid payId);
+
+
+        /// <summary>
+        /// Xoá nhiều bản ghi theo danh sách id truyền vào
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns>Số lượng Id xoá thành công</returns>
+        /// Author: NVDUC (25/3/2023)
+        public int DeleteMultiple(Guid[]? recordList);
     }
 }

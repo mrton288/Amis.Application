@@ -26,7 +26,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="recordId"></param>
         /// <returns>Thông tin của bản ghi đó</returns>
         /// Author: NVDUC (23/3/2023)
-        public T GetRecordById(Guid recordId);
+        public dynamic GetRecordById(Guid recordId);
 
         /// <summary>
         /// Cập nhật thông tin bản ghi theo Id
@@ -36,7 +36,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <returns>Trạng thái của hành động</returns>
         /// Author: NVDUC (23/3/2023)
         /// 
-        public T UpdateRecordById(Guid recordId, T newRecord);
+        public int UpdateRecordById(Guid recordId, T newRecord);
 
         /// <summary>
         /// Thực hiện thêm mới bản ghi
@@ -44,7 +44,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="newRecord"></param>
         /// <returns>Trạng thái của hành động thêm mới</returns>
         /// Author: NVDUC (23/3/2023)
-        public int InsertRecord(T newRecord);
+        public InsertResult InsertRecord(T newRecord);
 
         /// <summary>
         /// Thực hiện thêm mới nhiều bản ghi
@@ -54,12 +54,19 @@ namespace Demo.WepApplication.DL.BaseDL
         public int InsertMultiple(IEnumerable<T> recordList);
 
         /// <summary>
+        /// Thực hiện sửa nhiều bản ghi
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns></returns>
+        public int UpdateMultiple(IEnumerable<T> recordList);
+
+        /// <summary>
         /// Xoá bản ghi theo Id
         /// </summary>
         /// <param name="recordId">Id của bản ghi</param>
         /// <returns>Mã trạng thái thành công hay thất bại</returns>
         /// Author: NVDUC (23/3/2023)
-        public T DeleteRecordById(Guid recordId);
+        public int DeleteRecordById(Guid recordId);
 
         /// <summary>
         /// Thực hiện tìm kiếm phân trang danh sách bản ghi
@@ -69,7 +76,7 @@ namespace Demo.WepApplication.DL.BaseDL
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public object GetPagingRecord(
+        public PagingResult<T> GetPagingRecord(
         string? search,
         int? pageNumber,
         int? pageSize

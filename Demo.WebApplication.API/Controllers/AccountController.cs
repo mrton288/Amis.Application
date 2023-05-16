@@ -6,6 +6,7 @@ using Demo.WebApplication.Common.Enums;
 using Demo.WebApplication.Common.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Printing;
 
 namespace Demo.WebApplication.API.Controllers
 {

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Demo.WepApplication.DL.EmployeeDL
 {
-    public interface IEmployeeDL : IBaseDL<Employee>
+    public interface IPayDetailDL : IBaseDL<Employee>
     {
         #region Method
         /// <summary>
@@ -35,14 +35,6 @@ namespace Demo.WepApplication.DL.EmployeeDL
         int? pageNumber,
         int? pageSize
        );
-
-        /// <summary>
-        /// Xoá nhiều nhân viên theo danh sách Id
-        /// </summary>
-        /// <param name="listEmployeeId"></param>
-        /// <returns>Số lượng Id trong danh sách</returns>
-        /// Author: NVDUC (25/3/2023)
-        public int DeleteMultiple(Guid[] listEmployeeId);
 
         /// <summary>
         /// Check trùng mã nhân viên

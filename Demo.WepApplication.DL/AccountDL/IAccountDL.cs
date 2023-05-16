@@ -1,4 +1,5 @@
 ﻿using Demo.WebApplication.Common.Entities;
+using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WepApplication.DL.BaseDL;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Demo.WepApplication.DL.AccountDL
         /// <param name="search"></param>
         /// <returns>Danh sách tài khoản</returns>
         /// Author: NVDUC (29/04/2023)
-        public IEnumerable<Account> GetAllByKey(string? search);
+        public PagingResult<Account> GetAllByKey(string? search);
 
         /// <summary>
         /// Thực hiện cập nhật trạng thái của tài khoản

@@ -48,16 +48,6 @@ namespace Demo.WebApplication.Common.Entities
         public Guid? department_id { get; set; }
 
         /// <summary>
-        /// Mã đơn vị
-        /// </summary>
-        public string? department_code { get; set; }
-
-        /// <summary>
-        /// Tên phòng ban
-        /// </summary>
-        public string? department_name { get; set; }
-
-        /// <summary>
         /// Chức danh
         /// </summary>
         public string? position_name { get; set; }

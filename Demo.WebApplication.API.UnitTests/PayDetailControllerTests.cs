@@ -1,10 +1,10 @@
 ﻿using Demo.WebApplication.API.Controllers;
 using Demo.WebApplication.BL.BaseBL;
-using Demo.WebApplication.BL.EmployeeBL;
+using Demo.WebApplication.BL.PayDetailBL;
 using Demo.WebApplication.Common.Entities;
 using Demo.WebApplication.Common.Entities.DTO;
 using Demo.WebApplication.Common.Enums;
-using Demo.WepApplication.DL.EmployeeDL;
+using Demo.WepApplication.DL.PayDetailDL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -22,18 +22,18 @@ namespace Demo.WebApplication.API.UnitTests
     /// <summary>
     /// Viết unittest sử dụng dữ liệu fake NSubstitute
     /// </summary>
-    public class EmployeesControllerTests
+    public class PayDetailControllerTests
     {
-        private IEmployeeDL fakeEmployeeDL;
-        private IEmployeeBL fakeEmployeeBL;
-        private EmployeesController employeesController;
+        private IPayDetailDL fakePayDetailDL;
+        private IPayDetailBL fakePayDetailBL;
+        private PayDetailController payDetailsController;
 
         [SetUp]
         public void Setup()
         {
-            fakeEmployeeDL = Substitute.For<IEmployeeDL>();
-            fakeEmployeeBL = Substitute.For<IEmployeeBL>();
-            employeesController = Substitute.For<EmployeesController>(fakeEmployeeBL);
+            fakePayDetailDL = Substitute.For<IPayDetailDL>();
+            fakePayDetailBL = Substitute.For<IPayDetailBL>();
+            payDetailsController = Substitute.For<PayDetailController>(fakePayDetailBL);
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace Demo.WebApplication.API.UnitTests
                 Guid.Parse("eb35c915-762e-4062-b317-f6be0abd421d")
             };
 
-            fakeEmployeeBL.DeleteMultiple(listId).Returns(1);
+            //fakePayDetailBL.DeleteMultiple(listId).Returns(listId.Count);
 
             // Act
-            ServiceResult actualResult = employeesController.DeleteMultiple(listId);
+            ServiceResult actualResult = payDetailsController.DeleteMultiple(listId);
 
             // Assert
             Assert.AreEqual(actualResult.IsSuccess, true);
@@ -69,10 +69,10 @@ namespace Demo.WebApplication.API.UnitTests
         {
             // Arrange: chuẩn bị dữ liệu đầu vào
             Guid[] listId = new Guid[] { };
-            fakeEmployeeBL.DeleteMultiple(listId).Returns(0);
+            //fakePayDetailBL.DeleteMultiple(listId).Returns(0);
 
             // Act
-            ServiceResult actualResult = employeesController.DeleteMultiple(listId);
+            ServiceResult actualResult = payDetailsController.DeleteMultiple(listId);
 
             // Assert
             Assert.AreEqual(actualResult.IsSuccess, false);
@@ -91,10 +91,10 @@ namespace Demo.WebApplication.API.UnitTests
                 Guid.Parse("9346c9f2-14da-46db-815a-0a2bd559e5d6"),
                 Guid.Parse("c14e0250-6316-4625-9da0-4902329c62ad"),
                 Guid.Parse("eb35c915-762e-4062-b317-f6be0abd421d") };
-            fakeEmployeeBL.DeleteMultiple(listId).Throws(new Exception("1"));
+            fakePayDetailBL.DeleteMultiple(listId).Throws(new Exception("1"));
 
             // Act
-            ServiceResult actualResult = employeesController.DeleteMultiple(listId);
+            ServiceResult actualResult = payDetailsController.DeleteMultiple(listId);
 
             // Assert
             Assert.AreEqual(actualResult.ErrorCode, Common.Enums.ErrorCode.Exception);

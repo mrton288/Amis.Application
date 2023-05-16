@@ -58,7 +58,6 @@ namespace Demo.WebApplication.API.Controllers
             }
         }
 
-
         /// <summary>
         /// Gọi api xuất excel theo điều kiện tìm kiếm
         /// </summary>
@@ -68,8 +67,7 @@ namespace Demo.WebApplication.API.Controllers
         [HttpGet("exportExcel")]
         public async Task<IActionResult> ExportExcelPay(string? key)
         {
-            List<Pay> pays = (List<Pay>)_payBL.GetAllByKey(key).Data;
-            var stream = await _payBL.ExportExcelPay(pays);
+            var stream = await _payBL.ExportExcelPay(key);
             try
             {
                 string excelName = "Danh_sach_chi_tien.xlsx";
@@ -78,6 +76,58 @@ namespace Demo.WebApplication.API.Controllers
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        [HttpDelete("deleteFullMultiple")]
+        public ServiceResult DeleteFullMultiple([FromBody] Guid[] ids)
+        {
+            try
+            {
+                return _payBL.DeleteFullMultiple(ids);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Thực hiện xoá bản ghi ở Table Pay đồng thời 
+        /// lấy ra và xoá bản ghi ở table Paydetail
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (11/05/2023)
+        [HttpDelete("deleteMultiple")]
+        public ServiceResult DeleteMultiple([FromQuery]Guid id)
+        {
+            try
+            {
+                return _payBL.DeleteMultiple(id);
+            }
+            catch
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = ContentMessage.Exception,
+                    UserMsg = ContentMessage.Exception,
+                    ErrorCode = ErrorCode.Exception,
+                };
             }
         }
     }

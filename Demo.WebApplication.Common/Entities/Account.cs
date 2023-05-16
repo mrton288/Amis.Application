@@ -26,6 +26,7 @@ namespace Demo.WebApplication.Common.Entities
         /// Tên tài khoản
         /// </summary>
         [Required]
+        [MaxLength(255)]
         public string account_name { get; set; }
 
         /// <summary>

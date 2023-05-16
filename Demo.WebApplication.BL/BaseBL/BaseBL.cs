@@ -50,7 +50,7 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="recordId"></param>
         /// <returns>Thông tin của bản ghi đó</returns>
         /// Author: NVDUC (23/3/2023)
-        public T GetRecordById(Guid recordId)
+        public dynamic GetRecordById(Guid recordId)
         {
             return _baseDL.GetRecordById(recordId);
         }
@@ -91,7 +91,7 @@ namespace Demo.WebApplication.BL.BaseBL
             }
             else
             {
-                if (_baseDL.UpdateRecordById(recordId, newRecord) != null)
+                if (_baseDL.UpdateRecordById(recordId, newRecord) > 0)
                 {
                     return new ServiceResult
                     {
@@ -148,13 +148,14 @@ namespace Demo.WebApplication.BL.BaseBL
             }
             else
             {
-                if (_baseDL.InsertRecord(newRecord) != 0)
+                var result = _baseDL.InsertRecord(newRecord);
+                if (result.NumberEffect > 0)
                 {
                     return new ServiceResult
                     {
                         IsSuccess = true,
                         UserMsg = Common.Resources.ContentMessage.S_Post,
-                        Data = newRecord
+                        Data = result.IdInsert,
                     };
                 }
                 else
@@ -204,28 +205,56 @@ namespace Demo.WebApplication.BL.BaseBL
             //}
             //else
             //{
-                if (_baseDL.InsertMultiple(records) != 0)
+            if (_baseDL.InsertMultiple(records) > 0)
+            {
+                return new ServiceResult
                 {
-                    return new ServiceResult
-                    {
-                        IsSuccess = true,
-                        UserMsg = Common.Resources.ContentMessage.S_Post,
-                        Data = records
-                    };
-                }
-                else
+                    IsSuccess = true,
+                    UserMsg = Common.Resources.ContentMessage.S_Post,
+                    Data = records
+                };
+            }
+            else
+            {
+                return new ServiceResult
                 {
-                    return new ServiceResult
-                    {
-                        IsSuccess = false,
-                        DevMsg = Common.Resources.ContentMessage.NotFound,
-                        UserMsg = Common.Resources.ContentMessage.E_Post,
-                        ErrorCode = Common.Enums.ErrorCode.NotFound,
-                    };
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.NotFound,
+                    UserMsg = Common.Resources.ContentMessage.E_Post,
+                    ErrorCode = Common.Enums.ErrorCode.NotFound,
+                };
                 //}
             }
         }
 
+        /// <summary>
+        /// Thực hiện sửa nhiều bản ghi
+        /// </summary>
+        /// <param name="recordList"></param>
+        /// <returns></returns>
+        /// Author: NVDUC (15/05/2023)
+        public ServiceResult UpdateMultiple(IEnumerable<T> recordList)
+        {
+            if (_baseDL.UpdateMultiple(recordList) > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = true,
+                    UserMsg = Common.Resources.ContentMessage.S_Put,
+                    Data = recordList
+                };
+            }
+            else
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.NotFound,
+                    UserMsg = Common.Resources.ContentMessage.E_Put,
+                    ErrorCode = Common.Enums.ErrorCode.NotFound,
+                };
+            }
+        }
 
         /// <summary>
         /// Xoá bản ghi theo Id
@@ -235,13 +264,13 @@ namespace Demo.WebApplication.BL.BaseBL
         /// Author: NVDUC (23/3/2023)
         public ServiceResult DeleteRecordById(Guid recordId)
         {
-            if (_baseDL.DeleteRecordById(recordId) != null)
+            if (_baseDL.DeleteRecordById(recordId) > 0)
             {
                 return new ServiceResult
                 {
                     IsSuccess = true,
                     DevMsg = ContentMessage.S_Delete,
-                    UserMsg = ContentMessage.S_DeleteEmployee,
+                    UserMsg = ContentMessage.S_Delete,
                     Data = recordId,
                 };
             }
@@ -315,13 +344,13 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <param name="pageSize"></param>
         /// <returns>Các bản ghi trùng với điều kiện</returns>
         /// Author: NVDUC (23/3/2023)
-        public object GetPagingRecord(
+        public PagingResult<T> GetPagingRecord(
         string? search,
         int? pageNumber,
         int? pageSize
        )
         {
-            return _baseDL.GetPagingRecord(search, pageNumber, pageSize);  
+            return _baseDL.GetPagingRecord(search, pageNumber, pageSize);
         }
 
         #endregion
