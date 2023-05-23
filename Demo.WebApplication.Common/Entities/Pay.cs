@@ -36,6 +36,7 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Diễn giải
         /// </summary>
+        [MaxLength(255)]
         public string? description { get; set; }
 
         /// <summary>
@@ -46,16 +47,19 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Tên đối tượng
         /// </summary>
+        [MaxLength(100)]
         public string? object_name { get; set; }
 
         /// <summary>
         /// Địa chỉ
         /// </summary>
+        [MaxLength(255)]
         public string? address { get; set; }
 
         /// <summary>
         /// Người nhận
         /// </summary>
+        [MaxLength(100)]
         public string? receiver { get; set; }
 
         /// <summary>

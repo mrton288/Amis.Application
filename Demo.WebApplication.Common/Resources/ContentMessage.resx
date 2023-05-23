@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DatePay" xml:space="preserve">
+    <value>Ngày hạch toán phải lớn hơn hoặc bằng Ngày phiếu chi. Xin vui lòng kiểm tra lại.</value>
+  </data>
   <data name="DateValidte" xml:space="preserve">
     <value> không lớn hơn ngày hiện tại.</value>
   </data>

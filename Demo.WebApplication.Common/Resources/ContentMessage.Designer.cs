@@ -61,6 +61,15 @@ namespace Demo.WebApplication.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ngày hạch toán phải lớn hơn hoặc bằng Ngày phiếu chi. Xin vui lòng kiểm tra lại..
+        /// </summary>
+        public static string DatePay {
+            get {
+                return ResourceManager.GetString("DatePay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to  không lớn hơn ngày hiện tại..
         /// </summary>
         public static string DateValidte {

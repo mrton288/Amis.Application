@@ -152,8 +152,7 @@ namespace Demo.WepApplication.DL.PayDL
                         {
                             workSheet.Column(i).Style.Font.Name = "Times New Roman";
                             workSheet.Column(i).Style.Font.Size = 11;
-                            workSheet.Columns[1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                            workSheet.Columns[1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            workSheet.Columns[1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             workSheet.Cells[3, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                             workSheet.Cells[tableIndex + 2, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
                             workSheet.Cells[forLoopIndex, i].Style.Border.BorderAround(ExcelBorderStyle.Thin);
@@ -226,6 +225,7 @@ namespace Demo.WepApplication.DL.PayDL
         /// Author: NVDUC (29/04/2023)
         public IEnumerable<dynamic> GetAllByKey(string? search)
         {
+
             search ??= "";
             string selectOption = "p.pay_id, p.ref_date, p.voucher_date, p.voucher_number, p.description, p.receiver, p.quantity, " +
                 "p.employee_id, p.object_id , s.supplier_code, COALESCE(p.object_name, s.supplier_name) AS object_name, COALESCE(p.address, s.address) AS address , COALESCE(p.receiver, s.supplier_name) AS receiver, " +
@@ -239,14 +239,22 @@ namespace Demo.WepApplication.DL.PayDL
                 "or s.supplier_code ilike ('%' || @search  || '%') " +
                 "or p.address ilike ('%' || @search  || '%')";
             string queryString = $"select {selectOption}  from pay p left join supplier s on p.object_id = s.supplier_id left join employee e on e.employee_id = p.employee_id {whereClause} order by p.voucher_number desc;";
-            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
+            try
             {
-                postgreSQL.Open();
-                // Thực hiện truy vấn
-                var result = postgreSQL.Query<dynamic>(queryString, new { search }, commandType: CommandType.Text);
-                postgreSQL.Close();
-                return result;
+                using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
+                {
+                    postgreSQL.Open();
+                    // Thực hiện truy vấn
+                    var result = postgreSQL.Query<dynamic>(queryString, new { search }, commandType: CommandType.Text);
+                    postgreSQL.Close();
+                    return result;
+                }
             }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -284,15 +292,16 @@ namespace Demo.WepApplication.DL.PayDL
                         }
 
                         transaction.Commit();
+                        postgreSQL.Close();
+                        return masterEffected + detailEffected;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         transaction.Rollback();
-                        throw ex;
+                        throw;
                     }
                 }
             }
-            return masterEffected + detailEffected;
         }
 
         /// <summary>
@@ -304,21 +313,33 @@ namespace Demo.WepApplication.DL.PayDL
         /// Author: NVDUC (11/05/2023)
         public int DeleteMultiple(Guid id)
         {
-            string queryDetail = $"Delete from paydetail where paydetail.pay_id = '{id}';";
-            string queryMaster = $"Delete from pay where pay.pay_id = '{id}';";
             int masterEffected = 0;
             int detailEffected = 0;
 
             // Kết nối tới db
-            using var postgresql = new NpgsqlConnection(DatabaseContext.ConnectionString);
-
-            postgresql.Open();
-            // Thực hiện query
-            masterEffected = postgresql.Execute(queryDetail, commandType: System.Data.CommandType.Text);
-            detailEffected = postgresql.Execute(queryMaster, commandType: System.Data.CommandType.Text);
-
-            postgresql.Close();
-            return masterEffected + detailEffected;
+            using (var postgresql = new NpgsqlConnection(DatabaseContext.ConnectionString))
+            {
+                postgresql.Open();
+                using (var transaction = postgresql.BeginTransaction())
+                {
+                    try
+                    {
+                        string queryDetail = $"Delete from paydetail where paydetail.pay_id = '{id}';";
+                        string queryMaster = $"Delete from pay where pay.pay_id = '{id}';";
+                        // Thực hiện query
+                        masterEffected = postgresql.Execute(queryDetail, commandType: System.Data.CommandType.Text);
+                        detailEffected = postgresql.Execute(queryMaster, commandType: System.Data.CommandType.Text);
+                        transaction.Commit();
+                        postgresql.Close();
+                        return masterEffected + detailEffected;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         /// <summary>

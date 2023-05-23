@@ -178,52 +178,62 @@ namespace Demo.WebApplication.BL.BaseBL
         /// <returns></returns>
         public ServiceResult InsertMultiple(IEnumerable<T> records)
         {
-            //var validateFailures = ValidateRequestData(newRecord);
-            //if (validateFailures.Count > 0)
-            //{
-            //    return new ServiceResult
-            //    {
-            //        IsSuccess = false,
-            //        DevMsg = Common.Resources.ContentMessage.InValid,
-            //        UserMsg = Common.Resources.ContentMessage.InValid,
-            //        ErrorCode = Common.Enums.ErrorCode.InvalidData,
-            //        Data = validateFailures
-            //    };
-            //}
-
-            //var validateFailuresCustom = ValidateRequestDataCustom(newRecord);
-            //if (validateFailuresCustom.Count > 0)
-            //{
-            //    return new ServiceResult
-            //    {
-            //        IsSuccess = false,
-            //        DevMsg = Common.Resources.ContentMessage.InValid,
-            //        UserMsg = Common.Resources.ContentMessage.InValid,
-            //        ErrorCode = Common.Enums.ErrorCode.InvalidData,
-            //        Data = validateFailuresCustom
-            //    };
-            //}
-            //else
-            //{
-            if (_baseDL.InsertMultiple(records) > 0)
+            List<string> validateFailures = new();
+            foreach (var record in records)
             {
-                return new ServiceResult
-                {
-                    IsSuccess = true,
-                    UserMsg = Common.Resources.ContentMessage.S_Post,
-                    Data = records
-                };
+                var validationFailures = ValidateRequestData(record);
+                validateFailures.AddRange(validationFailures);
             }
-            else
+            if (validateFailures.Count > 0)
             {
                 return new ServiceResult
                 {
                     IsSuccess = false,
-                    DevMsg = Common.Resources.ContentMessage.NotFound,
-                    UserMsg = Common.Resources.ContentMessage.E_Post,
-                    ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailures
                 };
-                //}
+            }
+
+            List<string> validateFailuresCustom = new();
+            foreach (var record in records)
+            {
+                var validationFailuresCustom = ValidateRequestData(record);
+                validateFailuresCustom.AddRange(validationFailuresCustom);
+            }
+            if (validateFailuresCustom.Count > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailuresCustom
+                };
+            }
+            else
+            {
+                if (_baseDL.InsertMultiple(records) > 0)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        UserMsg = Common.Resources.ContentMessage.S_Post,
+                        Data = records
+                    };
+                }
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.E_Post,
+                        ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    };
+                }
             }
         }
 
@@ -235,24 +245,62 @@ namespace Demo.WebApplication.BL.BaseBL
         /// Author: NVDUC (15/05/2023)
         public ServiceResult UpdateMultiple(IEnumerable<T> recordList)
         {
-            if (_baseDL.UpdateMultiple(recordList) > 0)
+            List<string> validateFailures = new();
+            foreach (var record in recordList)
             {
-                return new ServiceResult
-                {
-                    IsSuccess = true,
-                    UserMsg = Common.Resources.ContentMessage.S_Put,
-                    Data = recordList
-                };
+                var validationFailures = ValidateRequestData(record);
+                validateFailures.AddRange(validationFailures);
             }
-            else
+            if (validateFailures.Count > 0)
             {
                 return new ServiceResult
                 {
                     IsSuccess = false,
-                    DevMsg = Common.Resources.ContentMessage.NotFound,
-                    UserMsg = Common.Resources.ContentMessage.E_Put,
-                    ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailures
                 };
+            }
+
+            List<string> validateFailuresCustom = new();
+            foreach (var record in recordList)
+            {
+                var validationFailuresCustom = ValidateRequestData(record);
+                validateFailuresCustom.AddRange(validationFailuresCustom);
+            }
+            if (validateFailuresCustom.Count > 0)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    DevMsg = Common.Resources.ContentMessage.InValid,
+                    UserMsg = Common.Resources.ContentMessage.InValid,
+                    ErrorCode = Common.Enums.ErrorCode.InvalidData,
+                    Data = validateFailuresCustom
+                };
+            }
+            else
+            {
+                if (_baseDL.UpdateMultiple(recordList) > 0)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = true,
+                        UserMsg = Common.Resources.ContentMessage.S_Put,
+                        Data = recordList
+                    };
+                }
+                else
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        DevMsg = Common.Resources.ContentMessage.NotFound,
+                        UserMsg = Common.Resources.ContentMessage.E_Put,
+                        ErrorCode = Common.Enums.ErrorCode.NotFound,
+                    };
+                }
             }
         }
 

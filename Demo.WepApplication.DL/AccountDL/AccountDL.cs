@@ -30,21 +30,29 @@ namespace Demo.WepApplication.DL.AccountDL
             string queryString = $"select * from account {querySearch} order by account.account_number asc;";
             string getTotalRecord = $"select count(*) from account {querySearch};";
             string excuteQuery = queryString + getTotalRecord;
-
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-            var resultSets = postgreSQL.QueryMultiple(excuteQuery,new { search }, commandType: CommandType.Text);
-            // Kiểm tra kết quả trả về
-            var data = resultSets.Read();
-            var totalRecord = resultSets.Read();
-
-            var result = new PagingResult<Account>
+            try
             {
-                ListRecord = data,
-                TotalRecord = totalRecord,
-            };
-            postgreSQL.Close();
-            return result;
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
+                var resultSets = postgreSQL.QueryMultiple(excuteQuery, new { search }, commandType: CommandType.Text);
+                // Kiểm tra kết quả trả về
+                var data = resultSets.Read();
+                var totalRecord = resultSets.Read();
+
+                var result = new PagingResult<Account>
+                {
+                    ListRecord = data,
+                    TotalRecord = totalRecord,
+                };
+                postgreSQL.Close();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -57,13 +65,21 @@ namespace Demo.WepApplication.DL.AccountDL
         public int UpdateStatus(Guid id, int statusUpdate)
         {
             string queryString = $"select * from func_account_update_status('{id}',{statusUpdate})";
+            try
+            {
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
 
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
+                var record = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
+                postgreSQL.Close();
+                return record;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
 
-            var record = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
-            postgreSQL.Close();
-            return record;
         }
 
         /// <summary>
@@ -75,13 +91,21 @@ namespace Demo.WepApplication.DL.AccountDL
         public IEnumerable<Account> GetListChild(Guid id)
         {
             string queryString = $"select * from func_account_update_children('{id}')";
+            try
+            {
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
 
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
+                var record = postgreSQL.Query<Account>(queryString, commandType: System.Data.CommandType.Text);
+                postgreSQL.Close();
+                return record.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
 
-            var record = postgreSQL.Query<Account>(queryString, commandType: System.Data.CommandType.Text);
-            postgreSQL.Close();
-            return record.ToList();
         }
 
         /// <summary>
@@ -98,13 +122,21 @@ namespace Demo.WepApplication.DL.AccountDL
             var parameters = new DynamicParameters();
             parameters.Add($"@id", id);
             parameters.Add($"@isParent", isParent);
+            try
+            {
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
 
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
+                var record = postgreSQL.Execute(queryString, parameters, commandType: System.Data.CommandType.Text);
+                postgreSQL.Close();
+                return record;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
 
-            var record = postgreSQL.Execute(queryString, parameters, commandType: System.Data.CommandType.Text);
-            postgreSQL.Close();
-            return record;
         }
 
         /// <summary>
@@ -122,16 +154,24 @@ namespace Demo.WepApplication.DL.AccountDL
             var parameters = new DynamicParameters();
             parameters.Add($"@AccountNumber", accountNumber);
             parameters.Add($"@AccountId", accountId);
-
-            // Khởi tạo kết nối tới database
-            using var postgreSql = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSql.Open();
-            var result = postgreSql.QueryFirstOrDefault<string>(stringFunction, parameters, commandType: System.Data.CommandType.Text);
-            if (result != null)
+            try
             {
-                return true;
+                // Khởi tạo kết nối tới database
+                using var postgreSql = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSql.Open();
+                var result = postgreSql.QueryFirstOrDefault<string>(stringFunction, parameters, commandType: System.Data.CommandType.Text);
+                if (result != null)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex) 
+            { 
+                Console.WriteLine(ex.Message); 
+                throw; 
+            }
+
         }
 
         /// <summary>
@@ -141,21 +181,31 @@ namespace Demo.WepApplication.DL.AccountDL
         /// <param name="newStatus"></param>
         /// <returns></returns>
         /// Author: NVDUC (05/05/2023)
-        public int UpdateMultipleStatus(Guid[] ids, int newStatus)  
+        public int UpdateMultipleStatus(Guid[] ids, int newStatus)
         {
-            // Chuẩn bị các tham số đầu vào
-            var parameters = new DynamicParameters();
-            parameters.Add("@listAccountId", ids);
-            parameters.Add("@newStatus", newStatus);
-
-            string queryString = $"select * from func_account_update_status_multiple(@listAccountId, @newStatus);";
-
             using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
             postgreSQL.Open();
-            int result = postgreSQL.QueryFirstOrDefault<int>(queryString,parameters, commandType: System.Data.CommandType.Text);
-            postgreSQL.Close();
 
-            return result;
+            using var transaction = postgreSQL.BeginTransaction();
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@listAccountId", ids);
+                parameters.Add("@newStatus", newStatus);
+
+                string queryString = $"select * from func_account_update_status_multiple(@listAccountId, @newStatus);";
+
+                int result = postgreSQL.QueryFirstOrDefault<int>(queryString, parameters, transaction, commandType: System.Data.CommandType.Text);
+
+                transaction.Commit();
+                postgreSQL.Close();
+                return result;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }

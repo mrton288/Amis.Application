@@ -158,7 +158,11 @@ namespace Demo.WebApplication.BL.PayBL
             var validateFailuresPay = new List<string>();
             if (_payDL.CheckDuplicateVoucherNumber(pay.voucher_number, pay.pay_id) == true)
             {
-                validateFailuresPay.Add($"Số phiếu chi <{pay.voucher_number}> đã tồn tại trong hệ thống, vui lòng kiểm tra lại.");
+                validateFailuresPay.Add($"Số phiếu chi <{pay.voucher_number}> đã tồn tại. Bạn có muốn chương trình tự động tăng số chứng từ không?");
+            }
+            if (pay.ref_date < pay.voucher_date)
+            {
+                validateFailuresPay.Add(Common.Resources.ContentMessage.DatePay);
             }
             return validateFailuresPay;
         }

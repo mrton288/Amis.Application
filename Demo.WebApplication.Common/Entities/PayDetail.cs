@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,16 +22,21 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Diễn giải
         /// </summary>
+        [MaxLength(255)]
         public string? description { get; set; }
 
         /// <summary>
         /// Tài khoản nợ
         /// </summary>
+        [Required]
+        [MaxLength(20)]
         public string debit_account { get; set; }
 
         /// <summary>
         /// Tài khoản có
         /// </summary>
+        [Required]
+        [MaxLength(20)]
         public string credit_account { get; set; }
 
         /// <summary>
@@ -44,13 +50,15 @@ namespace Demo.WebApplication.Common.Entities
         public Guid? object_id { get; set; }
 
         /// <summary>
-        /// Tên đối tượng
+        /// Mã đối tượng
         /// </summary>
+        [MaxLength(20)]
         public string? object_code { get; set; }
 
         /// <summary>
         /// Tên đối tượng
         /// </summary>
+        [MaxLength(100)]
         public string? object_name { get; set; }
 
         /// <summary>

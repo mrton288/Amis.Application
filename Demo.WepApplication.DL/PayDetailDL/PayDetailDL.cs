@@ -28,23 +28,30 @@ namespace Demo.WepApplication.DL.PayDetailDL
             string getTotalRecord = $"select count(*) from paydetail pd {queryWhere};";
 
             string excuteQuery = queryString + getTotalAmount + getTotalRecord;
-
-            using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
-            postgreSQL.Open();
-            var resultSets = postgreSQL.QueryMultiple(excuteQuery, commandType: CommandType.Text);
-            // Kiểm tra kết quả trả về
-            var data = resultSets.Read();
-            var totalAmount = resultSets.Read();
-            var totalRecord = resultSets.Read();
-
-            var result = new PagingResult<PayDetail>
+            try
             {
-                ListRecord = data,
-                OptionResult = totalAmount,
-                TotalRecord = totalRecord,
-            };
-            postgreSQL.Close();
-            return result;
+                using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
+                postgreSQL.Open();
+                var resultSets = postgreSQL.QueryMultiple(excuteQuery, commandType: CommandType.Text);
+                // Kiểm tra kết quả trả về
+                var data = resultSets.Read();
+                var totalAmount = resultSets.Read();
+                var totalRecord = resultSets.Read();
+
+                var result = new PagingResult<PayDetail>
+                {
+                    ListRecord = data,
+                    OptionResult = totalAmount,
+                    TotalRecord = totalRecord,
+                };
+                postgreSQL.Close();
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
         }
 
         /// <summary>

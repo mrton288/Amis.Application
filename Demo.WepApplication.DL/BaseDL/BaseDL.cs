@@ -138,6 +138,7 @@ namespace Demo.WepApplication.DL.BaseDL
                 postgreSQL.Open();
                 // Thực hiện câu lệnh sql
                 var rowEffected = postgreSQL.Execute(queryString, commandType: System.Data.CommandType.Text);
+                postgreSQL.Close();
                 return new InsertResult
                 {
                     IdInsert = id,
@@ -305,43 +306,43 @@ namespace Demo.WepApplication.DL.BaseDL
         /// Author: NVDUC (23/3/2023)
         public int UpdateRecordById(Guid recordId, T newRecord)
         {
-            try
+
+            string tableName = typeof(T).Name;
+            string setValues = string.Join(", ", typeof(T).GetProperties().Select(p =>
             {
-                string tableName = typeof(T).Name;
-                string setValues = string.Join(", ", typeof(T).GetProperties().Select(p =>
+                if (p.Name == $"{tableName}_id".ToLower())
                 {
-                    if (p.Name == $"{tableName}_id".ToLower())
+                    return $"{p.Name} = '{recordId}'";
+                }
+                else if (p.Name == "modified_date")
+                {
+                    return $"{p.Name} = '{(string)DateTime.Now.ToString("yyyy-MM-dd")}'";
+                }
+                else if (p.PropertyType == typeof(DateTime?))
+                {
+                    var dateValue = (DateTime?)p.GetValue(newRecord);
+                    if (dateValue.HasValue)
                     {
-                        return $"{p.Name} = '{recordId}'";
-                    }
-                    else if (p.Name == "modified_date")
-                    {
-                        return $"{p.Name} = '{(string)DateTime.Now.ToString("yyyy-MM-dd")}'";
-                    }
-                    else if (p.PropertyType == typeof(DateTime?))
-                    {
-                        var dateValue = (DateTime?)p.GetValue(newRecord);
-                        if (dateValue.HasValue)
-                        {
-                            return $"{p.Name} = '{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
-                        }
-                        else
-                        {
-                            return $"{p.Name} = null";
-                        }
-                    }
-                    else if (p.GetValue(newRecord) == null)
-                    {
-                        return $"{p.Name} = null";
+                        return $"{p.Name} = '{(string)dateValue.Value.ToString("yyyy-MM-dd")}'";
                     }
                     else
                     {
-                        return $"{p.Name} = '{p.GetValue(newRecord)}'";
+                        return $"{p.Name} = null";
                     }
+                }
+                else if (p.GetValue(newRecord) == null)
+                {
+                    return $"{p.Name} = null";
+                }
+                else
+                {
+                    return $"{p.Name} = '{p.GetValue(newRecord)}'";
+                }
 
-                })); // Lọc bỏ các giá trị null
-                string queryString = $"UPDATE {tableName} SET {setValues} WHERE {tableName}_id = '{recordId}'";
-
+            })); // Lọc bỏ các giá trị null
+            string queryString = $"UPDATE {tableName} SET {setValues} WHERE {tableName}_id = '{recordId}'";
+            try
+            {
                 using var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString);
                 postgreSQL.Open();
                 // Thực hiện câu lệnh sql
@@ -405,25 +406,33 @@ namespace Demo.WepApplication.DL.BaseDL
                     + "or cast(pay.ref_date as text) ilike ('%' || @search  || '%') " + "or cast(pay.ref_date as text) ilike ('%' || @search  || '%') " + "or pay.voucher_number ilike ('%' || @search  || '%') " + "or pay.description ilike ('%' || @search  || '%');";
                 getTotalRecord = $"select count(*) from {typeof(T).Name} " + queryCustom.joinOption + " " + queryCustom.search + ";";
             }
-            using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
+            try
             {
-                postgreSQL.Open();
-                // Thực hiện truy vấn
-                string excuteQuery = queryString + getTotalRecord + getTotalAmount;
-                var resultSets = postgreSQL.QueryMultiple(excuteQuery, new { search, limit = pageSize, offset = offset }, commandType: CommandType.Text);
-                // Kiểm tra kết quả trả về
-                var data = resultSets.Read();
-                var totalRecord = resultSets.Read();
-                var totalAmount = getTotalAmount != null ? resultSets.Read() : null;
-
-                var result = new PagingResult<T>
+                using (var postgreSQL = new NpgsqlConnection(DatabaseContext.ConnectionString))
                 {
-                    ListRecord = data,
-                    TotalRecord = totalRecord,
-                    OptionResult = totalAmount,
-                };
-                postgreSQL.Close();
-                return result;
+                    postgreSQL.Open();
+                    // Thực hiện truy vấn
+                    string excuteQuery = queryString + getTotalRecord + getTotalAmount;
+                    var resultSets = postgreSQL.QueryMultiple(excuteQuery, new { search, limit = pageSize, offset = offset }, commandType: CommandType.Text);
+                    // Kiểm tra kết quả trả về
+                    var data = resultSets.Read();
+                    var totalRecord = resultSets.Read();
+                    var totalAmount = getTotalAmount != null ? resultSets.Read() : null;
+
+                    var result = new PagingResult<T>
+                    {
+                        ListRecord = data,
+                        TotalRecord = totalRecord,
+                        OptionResult = totalAmount,
+                    };
+                    postgreSQL.Close();
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
             }
         }
 

@@ -32,6 +32,7 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Tên tài khoản
         /// </summary>
+        [MaxLength(255)]
         public string account_english_name { get; set; }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace Demo.WebApplication.Common.Entities
         /// <summary>
         /// Mô tả
         /// </summary>
+        [MaxLength(255)]
         public string? description { get; set; }
 
         /// <summary>
